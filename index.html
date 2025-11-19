@@ -2,7 +2,7 @@
 <html lang="fa">
 <head>
   <meta charset="UTF-8" />
-  <title>Ball & Blocks - Tavita Edition</title>
+  <title>BallRain - توپ‌بارون</title>
   <style>
     *{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
     body{
@@ -22,11 +22,24 @@
       align-items:center;
       justify-content:space-between;
       direction:ltr;
-      font-size:16px;
+      font-size:14px;
+      gap:8px;
     }
     #top-left{
       display:flex;
       gap:16px;
+      align-items:center;
+      font-size:14px;
+    }
+    #top-center{
+      flex:1;
+      text-align:center;
+      font-size:16px;
+      font-weight:bold;
+    }
+    #top-right{
+      display:flex;
+      gap:6px;
       align-items:center;
     }
     #game-container{
@@ -72,6 +85,13 @@
       background:#1abc9c;
     }
     #hint{opacity:.85;flex:1;min-width:160px}
+
+    .iconBtn{
+      background:#2c2e7a;
+      padding:4px 8px;
+      font-size:14px;
+      box-shadow:0 0 6px rgba(0,0,0,.4);
+    }
 
     .overlay{
       position:fixed;
@@ -158,6 +178,10 @@
       80%{opacity:1;}
       100%{opacity:0;transform:translateY(-6px);}
     }
+
+    #gameOverBox p{
+      margin:4px 0;
+    }
   </style>
 </head>
 <body>
@@ -166,7 +190,13 @@
       <div>BEST: <span id="bestScore">0</span></div>
       <div>LVL: <span id="levelLabel">1</span></div>
     </div>
-    <div id="currentScore">0</div>
+    <div id="top-center">
+      <span id="currentScore">0</span>
+    </div>
+    <div id="top-right">
+      <button id="soundBtn" class="iconBtn">🔊</button>
+      <button id="pauseBtn" class="iconBtn">⏸</button>
+    </div>
   </div>
 
   <div id="game-container">
@@ -230,6 +260,17 @@
     </div>
   </div>
 
+  <!-- گیم اور حرفه‌ای -->
+  <div id="gameOverOverlay" class="overlay">
+    <div class="box" id="gameOverBox">
+      <h3>پایان بازی 🎮</h3>
+      <p id="gameOverScoreText">امتیاز شما: 0</p>
+      <p id="gameOverBestText" style="font-size:12px;opacity:.85;"></p>
+      <p style="font-size:12px;opacity:.9;">می‌تونی دوباره تلاش کنی و رکورد خودت رو بشکنی 😎</p>
+      <button class="closeBtn" id="retryBtn">دوباره تلاش کن</button>
+    </div>
+  </div>
+
   <script>
     const canvas = document.getElementById("game");
     const ctx = canvas.getContext("2d");
@@ -258,8 +299,18 @@
     const shopMessage = document.getElementById("shopMessage");
     const hintEl = document.getElementById("hint");
 
+    const pauseBtn = document.getElementById("pauseBtn");
+    const soundBtn = document.getElementById("soundBtn");
+
+    const gameOverOverlay = document.getElementById("gameOverOverlay");
+    const gameOverScoreText = document.getElementById("gameOverScoreText");
+    const gameOverBestText = document.getElementById("gameOverBestText");
+    const retryBtn = document.getElementById("retryBtn");
+
     let audioCtx;
+    let isMuted = false;
     function playBeep(freq=600, dur=0.07){
+      if(isMuted) return;
       try{
         if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
         const osc = audioCtx.createOscillator();
@@ -291,6 +342,8 @@
     let frame = 0;
     let shake = 0;
     let hintTimeout = null;
+    let isPaused = false;
+    let gameOver = false;
 
     const cols = 7;
     const padding = 6;
@@ -310,64 +363,59 @@
     }
 
     function spawnRow(){
-  const blockWidth = (canvas.width - (cols+1)*padding)/cols;
-  const blockHeight = blockWidth * .7;
+      const blockWidth = (canvas.width - (cols+1)*padding)/cols;
+      const blockHeight = blockWidth * .7;
 
-  for(let c=0; c<cols; c++){
-    if(Math.random() < 0.75){  // کمی بیشتر بلوک بیاد
-      const x = padding + c*(blockWidth+padding);
-      const y = padding;
+      for(let c=0; c<cols; c++){
+        if(Math.random() < 0.75){
+          const x = padding + c*(blockWidth+padding);
+          const y = padding;
 
-      // سختی هوشمند – نمایی و موج‌محور
-      const base = 5 + (level * 3) + (waves * 2);
-      const multiplier = 1 + (level * 0.15);  
-      const spread = 5 + level * 3;
-      const val = Math.floor((base + randInt(0, spread)) * multiplier);
+          const base = 5 + (level * 3) + (waves * 2);
+          const multiplier = 1 + (level * 0.15);
+          const spread = 5 + level * 3;
+          const val = Math.floor((base + randInt(0, spread)) * multiplier);
 
-      let type = "normal";
-      const r = Math.random();
-      const effBombChance = (bombChance + level * 0.015);
+          let type = "normal";
+          const r = Math.random();
+          const effBombChance = (bombChance + level * 0.015);
 
-      if(r < effBombChance) type = "bomb";
-      else if(r < effBombChance + 0.05) type = "ice";
-      else if(r < effBombChance + 0.10) type = "moving";
-      else if(r < effBombChance + 0.15) type = "armor";
+          if(r < effBombChance) type = "bomb";
+          else if(r < effBombChance + 0.05) type = "ice";
+          else if(r < effBombChance + 0.10) type = "moving";
+          else if(r < effBombChance + 0.15) type = "armor";
 
-      blocks.push({
-        x, y, w:blockWidth, h:blockHeight,
-        value: val,
-        type,
-        hpExtra: type==="ice" ? 1 : (type==="armor" ? 2 : 0),
-        color: pickColor(type, val),
-        alive: true,
-        vx: type === "moving" ? (Math.random()<0.5 ? -1 : 1) * (0.7 + level * 0.1) : 0
-      });
+          blocks.push({
+            x, y, w:blockWidth, h:blockHeight,
+            value: val,
+            type,
+            hpExtra: type==="ice" ? 1 : (type==="armor" ? 2 : 0),
+            color: pickColor(type, val),
+            alive: true,
+            vx: type === "moving" ? (Math.random()<0.5 ? -1 : 1) * (0.7 + level * 0.1) : 0
+          });
+        }
+      }
+
+      if(Math.random() < 0.55){
+        const px = randInt(40, canvas.width - 40);
+        const py = padding + blockHeight + 12;
+        const types = ["extraBall","damageUp","bombUp"];
+        powerUps.push({x:px,y:py,r:10,type:types[randInt(0,2)],collected:false});
+      }
     }
-  }
-
-  // پاورآپ
-  if(Math.random() < 0.55){
-    const px = randInt(40, canvas.width - 40);
-    const py = padding + blockHeight + 12;
-    const types = ["extraBall","damageUp","bombUp"];
-    powerUps.push({x:px,y:py,r:10,type:types[randInt(0,2)],collected:false});
-  }
-}
 
     function moveBlocksDown(){
-  const baseRowHeight = blocks.length ? (blocks[0].h + padding) : 40;
+      const baseRowHeight = blocks.length ? (blocks[0].h + padding) : 40;
 
-  // سختی واقعی مرحله
-  const levelFactor = 1 + (level - 1) * 0.35;
+      const levelFactor = 1 + (level - 1) * 0.35;
+      const waveFactor = 1 + Math.min(waves, 15) * 0.04;
 
-  // اثر موج‌ها (تا سقف 15 موج)
-  const waveFactor = 1 + Math.min(waves, 15) * 0.04;
+      const moveAmount = baseRowHeight * levelFactor * waveFactor;
 
-  const moveAmount = baseRowHeight * levelFactor * waveFactor;
-
-  for(const b of blocks) b.y += moveAmount;
-  for(const p of powerUps) p.y += moveAmount;
-}
+      for(const b of blocks) b.y += moveAmount;
+      for(const p of powerUps) p.y += moveAmount;
+    }
 
     function updateLabels(){
       scoreEl.textContent = score;
@@ -380,6 +428,7 @@
       score=0; level=1; waves=0;
       numBalls=25; damagePerHit=1; bombChance=0.08;
       turnInProgress=false; frame=0;
+      shake=0; isPaused=false;
       spawnRow();
       updateLabels();
     }
@@ -423,18 +472,18 @@
     }
 
     function startAim(evt){
-      if(turnInProgress) return;
+      if(turnInProgress || isPaused || gameOver) return;
       isAiming=true;
       const p = getCanvasPos(evt);
       aimX=p.x; aimY=p.y;
     }
     function moveAim(evt){
-      if(!isAiming) return;
+      if(!isAiming || isPaused || gameOver) return;
       const p = getCanvasPos(evt);
       aimX=p.x; aimY=p.y;
     }
     function endAim(){
-      if(!isAiming) return;
+      if(!isAiming || isPaused || gameOver) return;
       isAiming=false;
       let angle = Math.atan2(aimY-baseY, aimX-baseX);
       if(angle>-0.15) angle=-0.15;
@@ -465,7 +514,7 @@
       hintTimeout = setTimeout(()=>{hintEl.textContent = old;}, 3000);
     }
 
-    shopBtn.onclick = ()=>{ if(!turnInProgress) shopOverlay.style.display="flex"; };
+    shopBtn.onclick = ()=>{ if(!turnInProgress && !gameOver) shopOverlay.style.display="flex"; };
     closeShopBtn.onclick = ()=>shopOverlay.style.display="none";
     shopOverlay.addEventListener("click",e=>{
       if(e.target===shopOverlay) shopOverlay.style.display="none";
@@ -476,8 +525,8 @@
         const item = btn.getAttribute("data-item");
         let cost = 0;
         if(item === "balls") cost = 450;
-else if(item === "damage") cost = 750;
-else if(item === "bomb") cost = 600;
+        else if(item === "damage") cost = 750;
+        else if(item === "bomb") cost = 600;
 
         if(score < cost){
           showShopMsg("امتیاز کافی نداری 😅");
@@ -491,7 +540,7 @@ else if(item === "bomb") cost = 600;
           flashHint("۳ توپ به مجموعه‌ات اضافه شد 🎯");
         }else if(item==="damage"){
           damagePerHit += 1;
-flashHint("قدرت توپ‌ها بیشتر شد 🔥");
+          flashHint("قدرت توپ‌ها بیشتر شد 🔥");
         }else if(item==="bomb"){
           bombChance += 0.03;
           flashHint("شانس بلوک‌های بمب بالاتر رفت 💣");
@@ -516,9 +565,10 @@ flashHint("قدرت توپ‌ها بیشتر شد 🔥");
       if(e.target===aboutOverlay) aboutOverlay.style.display="none";
     });
 
+    // پاورآپ‌ها
     function applyPowerUp(type){
       if(type==="extraBall"){
-        numBalls += 2;
+        numBalls += 2; // جایزه ۲ توپ
         flashHint("۲ توپ جایزه گرفتی! 😍");
       }else if(type==="damageUp"){
         damagePerHit += 1;
@@ -529,6 +579,34 @@ flashHint("قدرت توپ‌ها بیشتر شد 🔥");
       }
       playBeep(900,0.1);
     }
+
+    // Pause
+    pauseBtn.onclick = ()=>{
+      if(gameOver) return;
+      isPaused = !isPaused;
+      pauseBtn.textContent = isPaused ? "▶️" : "⏸";
+      flashHint(isPaused ? "بازی متوقف شد ⏸" : "ادامه بازی ▶️");
+    };
+
+    // Sound
+    soundBtn.onclick = ()=>{
+      isMuted = !isMuted;
+      soundBtn.textContent = isMuted ? "🔇" : "🔊";
+    };
+
+    // Retry
+    retryBtn.onclick = ()=>{
+      gameOverOverlay.style.display = "none";
+      gameOver = false;
+      resetGame();
+    };
+    gameOverOverlay.addEventListener("click", e=>{
+      if(e.target === gameOverOverlay){
+        gameOverOverlay.style.display="none";
+        gameOver = false;
+        resetGame();
+      }
+    });
 
     function update(){
       frame++;
@@ -633,33 +711,35 @@ flashHint("قدرت توپ‌ها بیشتر شد 🔥");
 
       // پایان موج
       if(turnInProgress && !activeAny){
-  turnInProgress = false;
-  frame = 0;
-  waves++;
+        turnInProgress = false;
+        frame = 0;
+        waves++;
 
-  // هر 5 موج → مرحله جدید
-  if(waves % 5 === 0){
-    level++;
-    flashHint("🎉 مرحله " + level + " شروع شد! سخت‌تر شد…");
-    playBeep(1100, 0.17);
-  }
+        if(waves % 5 === 0){
+          level++;
+          flashHint("🎉 مرحله " + level + " شروع شد! سخت‌تر شد…");
+          playBeep(1100, 0.17);
+        }
 
-  moveBlocksDown();
-  spawnRow();
+        moveBlocksDown();
+        spawnRow();
 
-  // گیم‌اور
-  for(const b of blocks){
-    if(b.y + b.h >= canvas.height - 20){
-      playBeep(200, 0.4);
-      alert("Game Over!\nScore: " + score);
-      if(score > bestScore) bestScore = score;
-      resetGame();
-      return;
-    }
-  }
+        // گیم‌اور
+        for(const b of blocks){
+          if(b.y + b.h >= canvas.height - 20){
+            playBeep(200, 0.4);
+            if(score > bestScore) bestScore = score;
+            updateLabels();
+            gameOver = true;
+            gameOverScoreText.textContent = "امتیاز شما: " + score;
+            gameOverBestText.textContent = "بهترین رکورد: " + bestScore;
+            gameOverOverlay.style.display = "flex";
+            return;
+          }
+        }
 
-  updateLabels();
-}
+        updateLabels();
+      }
 
       if(shake>0) shake--;
     }
@@ -755,7 +835,9 @@ flashHint("قدرت توپ‌ها بیشتر شد 🔥");
     }
 
     function loop(){
-      update();
+      if(!isPaused && !gameOver){
+        update();
+      }
       draw();
       requestAnimationFrame(loop);
     }
