@@ -310,60 +310,63 @@
     }
 
     function spawnRow(){
-      const blockWidth = (canvas.width - (cols+1)*padding)/cols;
-      const blockHeight = blockWidth*.7;
-      for(let c=0;c<cols;c++){
-        if(Math.random()<0.72){
-          const x = padding + c*(blockWidth+padding);
-          const y = padding;
+  const blockWidth = (canvas.width - (cols+1)*padding)/cols;
+  const blockHeight = blockWidth * .7;
 
-          const base = 5 + level*4 + waves*1;
-          const spread = 5 + level*3;
-          const val = randInt(base, base + spread);
+  for(let c=0; c<cols; c++){
+    if(Math.random() < 0.75){  // کمی بیشتر بلوک بیاد
+      const x = padding + c*(blockWidth+padding);
+      const y = padding;
 
-          let type="normal";
-          const r = Math.random();
-          const effBombChance = bombChance + level*0.01;
-          if(r < effBombChance) type="bomb";
-          else if(r < effBombChance+0.07) type="ice";
-          else if(r < effBombChance+0.14) type="moving";
-          else if(r < effBombChance+0.2) type="armor";
+      // سختی هوشمند – نمایی و موج‌محور
+      const base = 5 + (level * 3) + (waves * 2);
+      const multiplier = 1 + (level * 0.15);  
+      const spread = 5 + level * 3;
+      const val = Math.floor((base + randInt(0, spread)) * multiplier);
 
-          blocks.push({
-            x,y,w:blockWidth,h:blockHeight,
-            value:val,
-            hpExtra:type==="ice"?1:(type==="armor"?2:0),
-            type,
-            color:pickColor(type,val),
-            alive:true,
-            vx:type==="moving" ? (Math.random()<0.5?-1:1)*0.8 : 0
-          });
-        }
-      }
+      let type = "normal";
+      const r = Math.random();
+      const effBombChance = (bombChance + level * 0.015);
 
-      if(Math.random()<0.6){
-        const px = randInt(40, canvas.width-40);
-        const py = padding + blockHeight + 12;
-        const types = ["extraBall","damageUp","bombUp"];
-        powerUps.push({x:px,y:py,r:10,type:types[randInt(0,types.length-1)],collected:false});
-      }
+      if(r < effBombChance) type = "bomb";
+      else if(r < effBombChance + 0.05) type = "ice";
+      else if(r < effBombChance + 0.10) type = "moving";
+      else if(r < effBombChance + 0.15) type = "armor";
+
+      blocks.push({
+        x, y, w:blockWidth, h:blockHeight,
+        value: val,
+        type,
+        hpExtra: type==="ice" ? 1 : (type==="armor" ? 2 : 0),
+        color: pickColor(type, val),
+        alive: true,
+        vx: type === "moving" ? (Math.random()<0.5 ? -1 : 1) * (0.7 + level * 0.1) : 0
+      });
     }
+  }
+
+  // پاورآپ
+  if(Math.random() < 0.55){
+    const px = randInt(40, canvas.width - 40);
+    const py = padding + blockHeight + 12;
+    const types = ["extraBall","damageUp","bombUp"];
+    powerUps.push({x:px,y:py,r:10,type:types[randInt(0,2)],collected:false});
+  }
+}
 
     function moveBlocksDown(){
-  // ارتفاع پایه هر ردیف
   const baseRowHeight = blocks.length ? (blocks[0].h + padding) : 40;
 
-  // هرچی لول بالاتر، جهش سقوط بیشتر
-  // لول 1 → 1x  |  لول 2 → 1.2x  |  لول 3 → 1.4x  ...
-  const levelFactor = 1 + (level - 1) * 0.2;
+  // سختی واقعی مرحله
+  const levelFactor = 1 + (level - 1) * 0.35;
 
-  // کمی هم با تعداد موج‌ها (waves) سخت‌تر بشه، ولی ملایم
-  const waveFactor = 1 + Math.min(waves, 15) * 0.03; // حداکثر حدود 1.45
+  // اثر موج‌ها (تا سقف 15 موج)
+  const waveFactor = 1 + Math.min(waves, 15) * 0.04;
 
-  const move = baseRowHeight * levelFactor * waveFactor;
+  const moveAmount = baseRowHeight * levelFactor * waveFactor;
 
-  for (const b of blocks) b.y += move;
-  for (const p of powerUps) p.y += move;
+  for(const b of blocks) b.y += moveAmount;
+  for(const p of powerUps) p.y += moveAmount;
 }
 
     function updateLabels(){
@@ -472,9 +475,9 @@
       btn.addEventListener("click", ()=>{
         const item = btn.getAttribute("data-item");
         let cost = 0;
-        if(item==="balls") cost = 300;
-        else if(item==="damage") cost = 500;
-        else if(item==="bomb") cost = 400;
+        if(item === "balls") cost = 450;
+else if(item === "damage") cost = 750;
+else if(item === "bomb") cost = 600;
 
         if(score < cost){
           showShopMsg("امتیاز کافی نداری 😅");
@@ -484,11 +487,11 @@
 
         score -= cost;
         if(item==="balls"){
-          numBalls += 5;
-          flashHint("۵ توپ به مجموعه‌ات اضافه شد 🎯");
+          numBalls += 3;
+          flashHint("۳ توپ به مجموعه‌ات اضافه شد 🎯");
         }else if(item==="damage"){
           damagePerHit += 1;
-          flashHint("قدرت توپ‌ها بیشتر شد 🔥");
+flashHint("قدرت توپ‌ها بیشتر شد 🔥");
         }else if(item==="bomb"){
           bombChance += 0.03;
           flashHint("شانس بلوک‌های بمب بالاتر رفت 💣");
@@ -630,32 +633,33 @@
 
       // پایان موج
       if(turnInProgress && !activeAny){
-        turnInProgress=false;
-        frame=0;
-        waves++;
+  turnInProgress = false;
+  frame = 0;
+  waves++;
 
-        // هر 5 موج → یک مرحله بالاتر
-        if(waves % 5 === 0){
-          level++;
-          flashHint("مرحله " + level + " 🎉 سخت‌تر شد!");
-          playBeep(1000,0.15);
-        }
+  // هر 5 موج → مرحله جدید
+  if(waves % 5 === 0){
+    level++;
+    flashHint("🎉 مرحله " + level + " شروع شد! سخت‌تر شد…");
+    playBeep(1100, 0.17);
+  }
 
-        moveBlocksDown();
-        spawnRow();
+  moveBlocksDown();
+  spawnRow();
 
-        // گیم اوور
-        for(const b of blocks){
-          if(b.y + b.h >= canvas.height-20){
-            playBeep(200,0.4);
-            alert("Game Over!\nScore: "+score);
-            if(score>bestScore) bestScore=score;
-            resetGame();
-            return;
-          }
-        }
-        updateLabels();
-      }
+  // گیم‌اور
+  for(const b of blocks){
+    if(b.y + b.h >= canvas.height - 20){
+      playBeep(200, 0.4);
+      alert("Game Over!\nScore: " + score);
+      if(score > bestScore) bestScore = score;
+      resetGame();
+      return;
+    }
+  }
+
+  updateLabels();
+}
 
       if(shake>0) shake--;
     }
