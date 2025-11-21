@@ -422,13 +422,13 @@ canvas{
 
     let baseX, baseY;
     function resizeCanvas(){
-  const w = Math.min(window.innerWidth * 0.97, 460);  // کمی عریض‌تر
-  const h = Math.min(window.innerHeight * 0.70, 720); // قد بازی هم کمی بیشتر
-  canvas.width = w;
-  canvas.height = h;
-  baseX = canvas.width / 2;
-  baseY = canvas.height - 22;
-}
+      const w = Math.min(window.innerWidth * 0.97, 460);
+      const h = Math.min(window.innerHeight * 0.70, 720);
+      canvas.width = w;
+      canvas.height = h;
+      baseX = canvas.width / 2;
+      baseY = canvas.height - 22;
+    }
     resizeCanvas();
     window.addEventListener("resize", resizeCanvas);
 
@@ -490,10 +490,36 @@ canvas{
     let isPaused = false;
     let gameOver = false;
 
+    // 🔥 سختی هوشمند
+    let difficultyFactor = 1;
+
     const cols = 7;
     const padding = 6;
 
     const randInt = (min,max)=>Math.floor(Math.random()*(max-min+1))+min;
+
+    // محاسبه فشار تخته (چقدر بلوک‌ها به پایین نزدیک‌ان)
+    function boardPressure(){
+      let maxY = 0;
+      for(const b of blocks){
+        if(b.y + b.h > maxY) maxY = b.y + b.h;
+      }
+      return maxY / canvas.height || 0;
+    }
+
+    // تنظیم هوشمند سختی
+    function recalcDifficulty(){
+      // بر اساس امتیاز و تعداد موج‌ها
+      const perf = (score / 220) + (waves / 12);
+      const desired = 1 + perf;
+
+      // به صورت نرم به سمت مقدار دلخواه حرکت کنه (که یه‌دفعه سخت نشه)
+      difficultyFactor += (desired - difficultyFactor) * 0.35;
+
+      // کلمپ: نه کمتر از 1، نه بیشتر از 2.1
+      if(difficultyFactor < 1) difficultyFactor = 1;
+      if(difficultyFactor > 2.1) difficultyFactor = 2.1;
+    }
 
     function pickColor(type,v){
       if(type==="bomb") return "#a66bff";
@@ -507,23 +533,35 @@ canvas{
       return "#ff5555";
     }
 
+    // 🔄 اسپاون بلوک با سختی هوشمند
     function spawnRow(){
       const blockWidth = (canvas.width - (cols+1)*padding)/cols;
       const blockHeight = blockWidth * .7;
 
+      // شانس ظاهر شدن بلوک در هر ستون (با توجه به سختی)
+      const spawnChanceBase = 0.7 + (difficultyFactor - 1) * 0.15;
+      const spawnChance = Math.min(0.93, Math.max(0.55, spawnChanceBase));
+
       for(let c=0; c<cols; c++){
-        if(Math.random() < 0.75){
+        if(Math.random() < spawnChance){
           const x = padding + c*(blockWidth+padding);
           const y = padding;
 
           const base = 5 + (level * 3) + (waves * 2);
           const multiplier = 1 + (level * 0.15);
           const spread = 5 + level * 3;
-          const val = Math.floor((base + randInt(0, spread)) * multiplier);
+          let val = (base + randInt(0, spread)) * multiplier;
+
+          // ضریب هوشمند HP بلوک‌ها
+          const hpFactor = 0.85 + 0.18 * difficultyFactor;
+          val = Math.floor(val * hpFactor);
 
           let type = "normal";
           const r = Math.random();
-          const effBombChance = (bombChance + level * 0.015);
+          const effBombChance = Math.min(
+            0.35,
+            bombChance + level * 0.012 + (difficultyFactor - 1) * 0.03
+          );
 
           if(r < effBombChance) type = "bomb";
           else if(r < effBombChance + 0.05) type = "ice";
@@ -537,7 +575,11 @@ canvas{
             hpExtra: type==="ice" ? 1 : (type==="armor" ? 2 : 0),
             color: pickColor(type, val),
             alive: true,
-            vx: type === "moving" ? (Math.random()<0.5 ? -1 : 1) * (0.7 + level * 0.1) : 0
+            vx: type === "moving"
+              ? (Math.random()<0.5 ? -1 : 1) *
+                (0.7 + level * 0.1) *
+                (0.9 + 0.13 * difficultyFactor)
+              : 0
           });
         }
       }
@@ -550,13 +592,15 @@ canvas{
       }
     }
 
+    // 🔽 پایین آمدن بلوک‌ها با توجه به سختی
     function moveBlocksDown(){
       const baseRowHeight = blocks.length ? (blocks[0].h + padding) : 40;
 
       const levelFactor = 1 + (level - 1) * 0.35;
       const waveFactor = 1 + Math.min(waves, 15) * 0.04;
+      const diffFactor = 0.92 + 0.12 * difficultyFactor;
 
-      const moveAmount = baseRowHeight * levelFactor * waveFactor;
+      const moveAmount = baseRowHeight * levelFactor * waveFactor * diffFactor;
 
       for(const b of blocks) b.y += moveAmount;
       for(const p of powerUps) p.y += moveAmount;
@@ -574,15 +618,18 @@ canvas{
       numBalls=25; damagePerHit=1; bombChance=0.08;
       turnInProgress=false; frame=0;
       shake=0; isPaused=false; gameOver=false;
+      difficultyFactor = 1;
       spawnRow();
       updateLabels();
     }
 
     resetGame();
 
+    // 🎯 شلیک با سرعت وابسته به سختی
     function shoot(angle){
       balls=[]; trails=[];
-      const speed = 6 + level*0.4;
+      const baseSpeed = 6 + level*0.4;
+      const speed = baseSpeed * (0.96 + 0.08 * difficultyFactor);
       for(let i=0;i<numBalls;i++){
         balls.push({
           x:baseX,y:baseY,
@@ -599,52 +646,53 @@ canvas{
     }
 
     function getCanvasPos(evt){
-  const rect = canvas.getBoundingClientRect();
-  let clientX, clientY;
-  if(evt.touches && evt.touches[0]){
-    clientX = evt.touches[0].clientX;
-    clientY = evt.touches[0].clientY;
-  }else if(evt.changedTouches && evt.changedTouches[0]){
-    clientX = evt.changedTouches[0].clientX;
-    clientY = evt.changedTouches[0].clientY;
-  }else{
-    clientX = evt.clientX;
-    clientY = evt.clientY;
-  }
-  const x = (clientX - rect.left) * (canvas.width / rect.width);
-  const y = (clientY - rect.top)  * (canvas.height / rect.height);
-  return {x,y};
-}
+      const rect = canvas.getBoundingClientRect();
+      let clientX, clientY;
+      if(evt.touches && evt.touches[0]){
+        clientX = evt.touches[0].clientX;
+        clientY = evt.touches[0].clientY;
+      }else if(evt.changedTouches && evt.changedTouches[0]){
+        clientX = evt.changedTouches[0].clientX;
+        clientY = evt.changedTouches[0].clientY;
+      }else{
+        clientX = evt.clientX;
+        clientY = evt.clientY;
+      }
+      const x = (clientX - rect.left) * (canvas.width / rect.width);
+      const y = (clientY - rect.top)  * (canvas.height / rect.height);
+      return {x,y};
+    }
 
-function startAim(evt){
-  if(turnInProgress || isPaused || gameOver) return;
-  isAiming=true;
-  const p = getCanvasPos(evt);
-  aimX=p.x; aimY=p.y;
-}
+    function startAim(evt){
+      if(turnInProgress || isPaused || gameOver) return;
+      isAiming=true;
+      const p = getCanvasPos(evt);
+      aimX=p.x; aimY=p.y;
+    }
 
-function moveAim(evt){
-  if(!isAiming || isPaused || gameOver) return;
-  const p = getCanvasPos(evt);
-  aimX=p.x; aimY=p.y;
-}
+    function moveAim(evt){
+      if(!isAiming || isPaused || gameOver) return;
+      const p = getCanvasPos(evt);
+      aimX=p.x; aimY=p.y;
+    }
 
-function endAim(){
-  if(!isAiming || isPaused || gameOver) return;
-  isAiming=false;
-  let angle = Math.atan2(aimY-baseY, aimX-baseX);
-  if(angle>-0.15) angle=-0.15;
-  if(angle<-Math.PI+0.15) angle=-Math.PI+0.15;
-  shoot(angle);
-}
+    function endAim(){
+      if(!isAiming || isPaused || gameOver) return;
+      isAiming=false;
+      let angle = Math.atan2(aimY-baseY, aimX-baseX);
+      if(angle>-0.15) angle=-0.15;
+      if(angle<-Math.PI+0.15) angle=-Math.PI+0.15;
+      shoot(angle);
+    }
 
-canvas.addEventListener("mousedown", e=>startAim(e));
-canvas.addEventListener("mousemove", e=>moveAim(e));
-canvas.addEventListener("mouseup",   ()=>endAim());
+    canvas.addEventListener("mousedown", e=>startAim(e));
+    canvas.addEventListener("mousemove", e=>moveAim(e));
+    canvas.addEventListener("mouseup",   ()=>endAim());
 
-canvas.addEventListener("touchstart", e=>{startAim(e); e.preventDefault();},{passive:false});
-canvas.addEventListener("touchmove",  e=>{moveAim(e); e.preventDefault();},{passive:false});
-canvas.addEventListener("touchend",   e=>{endAim();  e.preventDefault();},{passive:false});
+    canvas.addEventListener("touchstart", e=>{startAim(e); e.preventDefault();},{passive:false});
+    canvas.addEventListener("touchmove",  e=>{moveAim(e); e.preventDefault();},{passive:false});
+    canvas.addEventListener("touchend",   e=>{endAim();  e.preventDefault();},{passive:false});
+
     function showShopMsg(text){
       shopMessage.textContent = text;
       shopMessage.classList.remove("shopMessageVisible");
@@ -846,15 +894,27 @@ canvas.addEventListener("touchend",   e=>{endAim();  e.preventDefault();},{passi
       blocks = blocks.filter(b=>b.alive);
       powerUps = powerUps.filter(p=>!p.collected && p.y<canvas.height-30);
 
+      // 🔁 پایان نوبت، تنظیم سختی و ساخت موج بعدی
       if(turnInProgress && !activeAny){
         turnInProgress = false;
         frame = 0;
+
+        const pressureBefore = boardPressure(); // چقدر به باخت نزدیک بودی؟
+
         waves++;
 
         if(waves % 5 === 0){
           level++;
           flashHint("🎉 مرحله " + level + " شروع شد! سخت‌تر شد…");
           playBeep(1100, 0.17);
+        }
+
+        // به‌روزرسانی هوشمند سختی
+        recalcDifficulty();
+
+        // اگر اوضاع بحرانی بود (بلوک‌ها خیلی پایین بودند) کمی سختی رو کم کن
+        if(pressureBefore > 0.7){
+          difficultyFactor = Math.max(1, difficultyFactor - 0.12);
         }
 
         moveBlocksDown();
