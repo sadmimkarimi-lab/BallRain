@@ -2,8 +2,121 @@
 <html lang="fa">
 <head>
   <meta charset="UTF-8" />
-  <title>BallRain - توپ‌بارون</title>
- 
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>توپ‌بارون</title>
+</head>
+
+ <body>
+
+<!-- ───────────── هــدر ───────────── -->
+<div id="top-bar">
+
+  <!-- چپ: شاپ + درباره ما -->
+  <div id="top-left">
+    <button id="shopBtn" class="topBtn">شاپ</button>
+    <button id="aboutBtn" class="topBtn">درباره ما</button>
+  </div>
+
+  <!-- وسط: امتیاز / مرحله / کنترل‌ها -->
+  <div id="top-center">
+    <div id="stats-row">
+      <span>BEST: <span id="bestScore">0</span></span>
+      <span>LVL: <span id="levelLabel">1</span></span>
+    </div>
+
+    <div id="scoreLabel">
+      امتیاز: <span id="currentScore">0</span>
+    </div>
+
+    <div id="icons-row">
+      <button id="soundBtn" class="iconBtn">🔊</button>
+      <button id="pauseBtn" class="iconBtn">⏸</button>
+    </div>
+  </div>
+
+  <!-- راست: لوگو + عنوان توپ‌بارون -->
+  <div id="top-right">
+    <div id="logoArea">
+      <img
+        id="gameLogo"
+        src="https://cdnfa.com/irangiah/a9be/uploads/bazi/picsart-25-11-14-07-34-00-477.webp"
+        alt="توپ‌بارون"
+      />
+      <div id="gameTitle">توپ‌بارون</div>
+    </div>
+  </div>
+
+</div>
+<!-- ─────────── پایان هدر ─────────── -->
+
+
+
+<!-- ───────────── بخش بازی ───────────── -->
+<div id="game-container">
+  <canvas id="game"></canvas>
+</div>
+
+
+
+<!-- ───────────── پیام پایین ───────────── -->
+<div id="bottom-bar">
+  <div id="hint">برای هدف‌گیری لمس کن و زاویه را انتخاب کن 🎯</div>
+</div>
+
+
+
+<!-- ───────────── پاپ‌آپ شاپ ───────────── -->
+<div id="shopOverlay" class="overlay">
+  <div class="box">
+    <h3>🎁 فروشگاه توپ‌بارون</h3>
+
+    <div id="shopMessage"></div>
+
+    <div class="shopItem">
+      <span>توپ اضافی +۳ — قیمت: ۴۵۰ امتیاز</span>
+      <button class="buyBtn" data-type="balls">خرید</button>
+    </div>
+
+    <div class="shopItem">
+      <span>افزایش قدرت توپ (لِوِل ۱+) — قیمت: ۷۵۰ امتیاز</span>
+      <button class="buyBtn" data-type="power">خرید</button>
+    </div>
+
+    <div class="shopItem">
+      <span>افزایش احتمال بلوک بمب — قیمت: ۶۰۰ امتیاز</span>
+      <button class="buyBtn" data-type="bomb">خرید</button>
+    </div>
+
+    <button id="closeShopBtn" class="closeBtn">بستن</button>
+  </div>
+</div>
+
+
+
+<!-- ───────────── پاپ‌آپ درباره ما ───────────── -->
+<div id="aboutOverlay" class="overlay">
+  <div class="box">
+    <h3>درباره تاویتا</h3>
+    <p>
+      تاویتا یک کانال آموزش تولید محتوا و هوش مصنوعی است که با رویکردی حرفه‌ای اما صمیمی،
+      به شما کمک می‌کند محتوای خلاق، مؤثر و درآمدزا بسازید.
+    </p>
+    <button id="closeAboutBtn" class="closeBtn">بستن</button>
+  </div>
+</div>
+
+
+
+<!-- ───────────── پاپ‌آپ گیم‌اور ───────────── -->
+<div id="gameOverOverlay" class="overlay">
+  <div class="box" id="gameOverBox">
+    <h3>پایان بازی 🎮</h3>
+    <p id="gameOverScoreText">امتیاز شما: 0</p>
+    <p id="gameOverBestText">بهترین رکورد: 0</p>
+
+    <button id="retryBtn" class="closeBtn">دوباره تلاش کن</button>
+  </div>
+</div>
   
 <style>
   *{
