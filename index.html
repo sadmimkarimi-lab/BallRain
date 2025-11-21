@@ -416,626 +416,597 @@ canvas{
   </div>
 
   <!-- ───────────── اسکریپت بازی (همون کد خودت) ───────────── -->
-  <script>
-    const canvas = document.getElementById("game");
-    const ctx = canvas.getContext("2d");
+<script>
+  const canvas = document.getElementById("game");
+  const ctx = canvas.getContext("2d");
 
-    let baseX, baseY;
-    function resizeCanvas(){
-      const w = Math.min(window.innerWidth * 0.97, 460);
-      const h = Math.min(window.innerHeight * 0.70, 720);
-      canvas.width = w;
-      canvas.height = h;
-      baseX = canvas.width / 2;
-      baseY = canvas.height - 22;
-    }
-    resizeCanvas();
-    window.addEventListener("resize", resizeCanvas);
+  let baseX, baseY;
+  function resizeCanvas(){
+    const w = Math.min(window.innerWidth * 0.97, 460);
+    const h = Math.min(window.innerHeight * 0.70, 720);
+    canvas.width = w;
+    canvas.height = h;
+    baseX = canvas.width / 2;
+    baseY = canvas.height - 22;
+  }
+  resizeCanvas();
+  window.addEventListener("resize", resizeCanvas);
 
-    const scoreEl = document.getElementById("currentScore");
-    const bestEl = document.getElementById("bestScore");
-    const levelLabel = document.getElementById("levelLabel");
-    const shopOverlay = document.getElementById("shopOverlay");
-    const shopBtn = document.getElementById("shopBtn");
-    const closeShopBtn = document.getElementById("closeShop");
-    const aboutOverlay = document.getElementById("aboutOverlay");
-    const aboutBtn = document.getElementById("aboutBtn");
-    const closeAboutBtn = document.getElementById("closeAbout");
-    const shopMessage = document.getElementById("shopMessage");
-    const hintEl = document.getElementById("hint");
+  const scoreEl = document.getElementById("currentScore");
+  const bestEl = document.getElementById("bestScore");
+  const levelLabel = document.getElementById("levelLabel");
+  const shopOverlay = document.getElementById("shopOverlay");
+  const shopBtn = document.getElementById("shopBtn");
+  const closeShopBtn = document.getElementById("closeShop");
+  const aboutOverlay = document.getElementById("aboutOverlay");
+  const aboutBtn = document.getElementById("aboutBtn");
+  const closeAboutBtn = document.getElementById("closeAbout");
+  const shopMessage = document.getElementById("shopMessage");
+  const hintEl = document.getElementById("hint");
 
-    const pauseBtn = document.getElementById("pauseBtn");
-    const soundBtn = document.getElementById("soundBtn");
+  const pauseBtn = document.getElementById("pauseBtn");
+  const soundBtn = document.getElementById("soundBtn");
 
-    const gameOverOverlay = document.getElementById("gameOverOverlay");
-    const gameOverScoreText = document.getElementById("gameOverScoreText");
-    const gameOverBestText = document.getElementById("gameOverBestText");
-    const retryBtn = document.getElementById("retryBtn");
+  const gameOverOverlay = document.getElementById("gameOverOverlay");
+  const gameOverScoreText = document.getElementById("gameOverScoreText");
+  const gameOverBestText = document.getElementById("gameOverBestText");
+  const retryBtn = document.getElementById("retryBtn");
 
-    let audioCtx;
-    let isMuted = false;
-    function playBeep(freq=600, dur=0.07){
-      if(isMuted) return;
-      try{
-        if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.frequency.value = freq;
-        osc.type = "triangle";
-        gain.gain.value = 0.08;
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + dur);
-      }catch(e){}
-    }
+  let audioCtx;
+  let isMuted = false;
+  function playBeep(freq=600, dur=0.07){
+    if(isMuted) return;
+    try{
+      if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.frequency.value = freq;
+      osc.type = "triangle";
+      gain.gain.value = 0.08;
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + dur);
+    }catch(e){}
+  }
 
-    // وضعیت بازی
-    let balls = [];
-    let trails = [];
-    let blocks = [];
-    let powerUps = [];
-    let isAiming = false;
-    let aimX = 0, aimY = 0;
-    let score = 0, bestScore = 0;
-    let level = 1;
-    let waves = 0;
-    let numBalls = 25;
-    let damagePerHit = 1;
-    let bombChance = 0.08;
-    let turnInProgress = false;
-    let frame = 0;
-    let shake = 0;
-    let hintTimeout = null;
-    let isPaused = false;
-    let gameOver = false;
+  // ───── وضعیت بازی ─────
+  let balls = [];
+  let trails = [];
+  let blocks = [];
+  let powerUps = [];
+  let isAiming = false;
+  let aimX = 0, aimY = 0;
+  let score = 0, bestScore = 0;
+  let level = 1;
+  let waves = 0;
+  let numBalls = 18;          // 👈 توپ‌های کمتر → بازی سخت‌تر
+  let damagePerHit = 1;
+  let bombChance = 0.10;      // 👈 کمی بیشتر از قبل
+  let turnInProgress = false;
+  let frame = 0;
+  let shake = 0;
+  let hintTimeout = null;
+  let isPaused = false;
+  let gameOver = false;
 
-    // 🔥 سختی هوشمند
-    let difficultyFactor = 1;
+  const cols = 7;
+  const padding = 6;
 
-    const cols = 7;
-    const padding = 6;
+  const randInt = (min,max)=>Math.floor(Math.random()*(max-min+1))+min;
 
-    const randInt = (min,max)=>Math.floor(Math.random()*(max-min+1))+min;
+  function pickColor(type,v){
+    if(type==="bomb") return "#a66bff";
+    if(type==="ice") return "#66d9ff";
+    if(type==="moving") return "#ffb347";
+    if(type==="armor") return "#c084ff";
+    if(v<12) return "#00bfff";
+    if(v<20) return "#8a2be2";
+    if(v<30) return "#ffd700";
+    if(v<45) return "#ff8c00";
+    return "#ff5555";
+  }
 
-    // محاسبه فشار تخته (چقدر بلوک‌ها به پایین نزدیک‌ان)
-    function boardPressure(){
-      let maxY = 0;
-      for(const b of blocks){
-        if(b.y + b.h > maxY) maxY = b.y + b.h;
+  // ───── ساخت ردیف جدید بلوک‌ها (نسخه سخت‌تر) ─────
+  function spawnRow(){
+    const blockWidth = (canvas.width - (cols+1)*padding)/cols;
+    const blockHeight = blockWidth * .7;
+
+    // شانس ایجاد بلوک در هر ستون – عمداً بالا گذاشتم تا بازی شلوغ باشه
+    // با افزایش level و waves بیشتر هم می‌شه
+    const spawnBase = 0.82 + level*0.03 + waves*0.02;
+    const spawnChance = Math.min(0.97, spawnBase);  // حداکثر ۹۷٪ هر ستون
+
+    for(let c=0; c<cols; c++){
+      if(Math.random() < spawnChance){
+        const x = padding + c*(blockWidth+padding);
+        const y = padding;
+
+        // پایه HP مثل نسخه خودت
+        const base = 5 + (level * 3) + (waves * 2);
+        const multiplier = 1 + (level * 0.15);
+        const spread = 5 + level * 3;
+        let val = base + randInt(0, spread);
+
+        // 👇 سختی اضافه: بر اساس level و waves مقدار HP رو تقویت کن
+        const difficultyBoost = 1 + (level-1)*0.28 + waves*0.18;
+        val = Math.floor(val * multiplier * difficultyBoost);
+
+        let type = "normal";
+        const r = Math.random();
+        const effBombChance = Math.min(
+          0.40,                                  // حداکثر ۴۰٪
+          bombChance + level * 0.02 + waves*0.01
+        );
+
+        if(r < effBombChance) type = "bomb";
+        else if(r < effBombChance + 0.04) type = "ice";
+        else if(r < effBombChance + 0.09) type = "moving";
+        else if(r < effBombChance + 0.14) type = "armor";
+
+        blocks.push({
+          x, y, w:blockWidth, h:blockHeight,
+          value: val,
+          type,
+          hpExtra: type==="ice" ? 1 : (type==="armor" ? 2 : 0),
+          color: pickColor(type, val),
+          alive: true,
+          // 👇 بلوک‌های متحرک سریع‌تر از نسخه قبلی
+          vx: type === "moving"
+            ? (Math.random()<0.5 ? -1 : 1) * (1.1 + level * 0.18)
+            : 0
+        });
       }
-      return maxY / canvas.height || 0;
     }
 
-    // تنظیم هوشمند سختی
-    function recalcDifficulty(){
-      // بر اساس امتیاز و تعداد موج‌ها
-      const perf = (score / 220) + (waves / 12);
-      const desired = 1 + perf;
+    // پاورآپ مثل قبل
+    if(Math.random() < 0.55){
+      const px = randInt(40, canvas.width - 40);
+      const py = padding + blockHeight + 12;
+      const types = ["extraBall","damageUp","bombUp"];
+      powerUps.push({x:px,y:py,r:10,type:types[randInt(0,2)],collected:false});
+    }
+  }
 
-      // به صورت نرم به سمت مقدار دلخواه حرکت کنه (که یه‌دفعه سخت نشه)
-      difficultyFactor += (desired - difficultyFactor) * 0.35;
+  // ───── پایین آمدن ردیف‌ها (بیشتر از قبل → سخت‌تر) ─────
+  function moveBlocksDown(){
+    const baseRowHeight = blocks.length ? (blocks[0].h + padding) : 40;
 
-      // کلمپ: نه کمتر از 1، نه بیشتر از 2.1
-      if(difficultyFactor < 1) difficultyFactor = 1;
-      if(difficultyFactor > 2.1) difficultyFactor = 2.1;
+    const levelFactor = 1 + (level - 1) * 0.4;
+    const waveFactor = 1 + Math.min(waves, 20) * 0.06;
+
+    // 👇 کلید سخت‌تر شدن
+    const moveAmount = baseRowHeight * levelFactor * waveFactor * 1.25;
+
+    for(const b of blocks) b.y += moveAmount;
+    for(const p of powerUps) p.y += moveAmount;
+  }
+
+  function updateLabels(){
+    scoreEl.textContent = score;
+    bestEl.textContent = bestScore;
+    levelLabel.textContent = level;
+  }
+
+  function resetGame(){
+    balls=[]; trails=[]; blocks=[]; powerUps=[];
+    score=0; level=1; waves=0;
+    numBalls=18;
+    damagePerHit=1;
+    bombChance=0.10;
+    turnInProgress=false; frame=0;
+    shake=0; isPaused=false; gameOver=false;
+    spawnRow();
+    updateLabels();
+  }
+
+  resetGame();
+
+  // ───── شلیک توپ‌ها (سرعت بیشتر → بازی شلوغ‌تر) ─────
+  function shoot(angle){
+    balls=[]; trails=[];
+    const speed = 7.2 + level*0.55;   // 👈 سریع‌تر از نسخه قبلی
+    for(let i=0;i<numBalls;i++){
+      balls.push({
+        x:baseX,y:baseY,
+        vx:Math.cos(angle)*speed,
+        vy:Math.sin(angle)*speed,
+        delay:i*2,
+        active:false,
+        returned:false
+      });
+    }
+    turnInProgress=true;
+    frame=0;
+    playBeep(650,0.09);
+  }
+
+  function getCanvasPos(evt){
+    const rect = canvas.getBoundingClientRect();
+    let clientX, clientY;
+    if(evt.touches && evt.touches[0]){
+      clientX = evt.touches[0].clientX;
+      clientY = evt.touches[0].clientY;
+    }else if(evt.changedTouches && evt.changedTouches[0]){
+      clientX = evt.changedTouches[0].clientX;
+      clientY = evt.changedTouches[0].clientY;
+    }else{
+      clientX = evt.clientX;
+      clientY = evt.clientY;
+    }
+    const x = (clientX - rect.left) * (canvas.width / rect.width);
+    const y = (clientY - rect.top)  * (canvas.height / rect.height);
+    return {x,y};
+  }
+
+  function startAim(evt){
+    if(turnInProgress || isPaused || gameOver) return;
+    isAiming=true;
+    const p = getCanvasPos(evt);
+    aimX=p.x; aimY=p.y;
+  }
+
+  function moveAim(evt){
+    if(!isAiming || isPaused || gameOver) return;
+    const p = getCanvasPos(evt);
+    aimX=p.x; aimY=p.y;
+  }
+
+  function endAim(){
+    if(!isAiming || isPaused || gameOver) return;
+    isAiming=false;
+    let angle = Math.atan2(aimY-baseY, aimX-baseX);
+    if(angle>-0.15) angle=-0.15;
+    if(angle<-Math.PI+0.15) angle=-Math.PI+0.15;
+    shoot(angle);
+  }
+
+  canvas.addEventListener("mousedown", e=>startAim(e));
+  canvas.addEventListener("mousemove", e=>moveAim(e));
+  canvas.addEventListener("mouseup",   ()=>endAim());
+
+  canvas.addEventListener("touchstart", e=>{startAim(e); e.preventDefault();},{passive:false});
+  canvas.addEventListener("touchmove",  e=>{moveAim(e); e.preventDefault();},{passive:false});
+  canvas.addEventListener("touchend",   e=>{endAim();  e.preventDefault();},{passive:false});
+
+  function showShopMsg(text){
+    shopMessage.textContent = text;
+    shopMessage.classList.remove("shopMessageVisible");
+    void shopMessage.offsetWidth;
+    shopMessage.classList.add("shopMessageVisible");
+  }
+
+  function flashHint(text){
+    if(hintTimeout) clearTimeout(hintTimeout);
+    const old = hintEl.textContent;
+    hintEl.textContent = text;
+    hintTimeout = setTimeout(()=>{hintEl.textContent = old;}, 3000);
+  }
+
+  shopBtn.onclick = ()=>{ if(!turnInProgress && !gameOver) shopOverlay.style.display="flex"; };
+  closeShopBtn.onclick = ()=>shopOverlay.style.display="none";
+  shopOverlay.addEventListener("click",e=>{
+    if(e.target===shopOverlay) shopOverlay.style.display="none";
+  });
+
+  document.querySelectorAll(".shopItem button").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const item = btn.getAttribute("data-item");
+      let cost = 0;
+      if(item === "balls") cost = 450;
+      else if(item === "damage") cost = 750;
+      else if(item === "bomb") cost = 600;
+
+      if(score < cost){
+        showShopMsg("امتیاز کافی نداری 😅");
+        playBeep(200,0.1);
+        return;
+      }
+
+      score -= cost;
+      if(item==="balls"){
+        numBalls += 3;
+        flashHint("۳ توپ به مجموعه‌ات اضافه شد 🎯");
+      }else if(item==="damage"){
+        damagePerHit += 1;
+        flashHint("قدرت توپ‌ها بیشتر شد 🔥");
+      }else if(item==="bomb"){
+        bombChance += 0.03;
+        flashHint("شانس بلوک‌های بمب بالاتر رفت 💣");
+      }
+
+      const row = document.querySelector(`.shopItem[data-item-row="${item}"]`);
+      if(row){
+        row.classList.add("bought");
+        setTimeout(()=>row.classList.remove("bought"), 300);
+      }
+
+      showShopMsg("خرید با موفقیت انجام شد ✅");
+      playBeep(900,0.12);
+      updateLabels();
+    });
+  });
+
+  // درباره ما
+  aboutBtn.onclick = ()=>{aboutOverlay.style.display="flex";};
+  closeAboutBtn.onclick = ()=>{aboutOverlay.style.display="none";};
+  aboutOverlay.addEventListener("click",e=>{
+    if(e.target===aboutOverlay) aboutOverlay.style.display="none";
+  });
+
+  function applyPowerUp(type){
+    if(type==="extraBall"){
+      numBalls += 2;
+      flashHint("۲ توپ جایزه گرفتی! 😍");
+    }else if(type==="damageUp"){
+      damagePerHit += 1;
+      flashHint("قدرت ضربه توپ‌ها بیشتر شد 🔥");
+    }else if(type==="bombUp"){
+      bombChance += 0.03;
+      flashHint("از حالا بمب‌ها بیشتر می‌شن 💣");
+    }
+    playBeep(900,0.1);
+  }
+
+  pauseBtn.onclick = ()=>{
+    if(gameOver) return;
+    isPaused = !isPaused;
+    pauseBtn.textContent = isPaused ? "▶️" : "⏸";
+    flashHint(isPaused ? "بازی متوقف شد ⏸" : "ادامه بازی ▶️");
+  };
+
+  soundBtn.onclick = ()=>{
+    isMuted = !isMuted;
+    soundBtn.textContent = isMuted ? "🔇" : "🔊";
+  };
+
+  retryBtn.onclick = ()=>{
+    gameOverOverlay.style.display = "none";
+    resetGame();
+  };
+  gameOverOverlay.addEventListener("click", e=>{
+    if(e.target === gameOverOverlay){
+      gameOverOverlay.style.display="none";
+      resetGame();
+    }
+  });
+
+  function update(){
+    frame++;
+
+    // حرکت بلوک‌های متحرک
+    for(const b of blocks){
+      if(b.type==="moving" && b.alive){
+        b.x += b.vx;
+        if(b.x<=padding || b.x+b.w>=canvas.width-padding) b.vx*=-1;
+      }
     }
 
-    function pickColor(type,v){
-      if(type==="bomb") return "#a66bff";
-      if(type==="ice") return "#66d9ff";
-      if(type==="moving") return "#ffb347";
-      if(type==="armor") return "#c084ff";
-      if(v<12) return "#00bfff";
-      if(v<20) return "#8a2be2";
-      if(v<30) return "#ffd700";
-      if(v<45) return "#ff8c00";
-      return "#ff5555";
+    // حرکت جزئی پاورآپ‌ها به پایین
+    for(const p of powerUps){
+      if(!p.collected) p.y += 0.15;
     }
 
-    // 🔄 اسپاون بلوک با سختی هوشمند
-    function spawnRow(){
-      const blockWidth = (canvas.width - (cols+1)*padding)/cols;
-      const blockHeight = blockWidth * .7;
+    let activeAny=false;
+    for(const ball of balls){
+      if(!ball.active && frame>=ball.delay) ball.active=true;
+      if(!ball.active || ball.returned) continue;
+      activeAny=true;
 
-      // شانس ظاهر شدن بلوک در هر ستون (با توجه به سختی)
-      const spawnChanceBase = 0.7 + (difficultyFactor - 1) * 0.15;
-      const spawnChance = Math.min(0.93, Math.max(0.55, spawnChanceBase));
+      ball.x += ball.vx;
+      ball.y += ball.vy;
 
-      for(let c=0; c<cols; c++){
-        if(Math.random() < spawnChance){
-          const x = padding + c*(blockWidth+padding);
-          const y = padding;
+      trails.push({x:ball.x,y:ball.y,life:18});
 
-          const base = 5 + (level * 3) + (waves * 2);
-          const multiplier = 1 + (level * 0.15);
-          const spread = 5 + level * 3;
-          let val = (base + randInt(0, spread)) * multiplier;
+      if(ball.x<=4 || ball.x>=canvas.width-4){
+        ball.vx*=-1;
+        ball.x = Math.max(4,Math.min(canvas.width-4,ball.x));
+      }
+      if(ball.y<=4){
+        ball.vy*=-1;
+        ball.y=4;
+      }
 
-          // ضریب هوشمند HP بلوک‌ها
-          const hpFactor = 0.85 + 0.18 * difficultyFactor;
-          val = Math.floor(val * hpFactor);
+      // برخورد با بلوک‌ها
+      for(const b of blocks){
+        if(!b.alive) continue;
+        if(ball.x>b.x && ball.x<b.x+b.w && ball.y>b.y && ball.y<b.y+b.h){
+          const ol = ball.x - b.x;
+          const orr = (b.x+b.w)-ball.x;
+          const ot = ball.y - b.y;
+          const ob = (b.y+b.h)-ball.y;
+          const minO = Math.min(ol,orr,ot,ob);
+          if(minO===ol || minO===orr) ball.vx*=-1;
+          else ball.vy*=-1;
 
-          let type = "normal";
-          const r = Math.random();
-          const effBombChance = Math.min(
-            0.35,
-            bombChance + level * 0.012 + (difficultyFactor - 1) * 0.03
-          );
+          if(b.type==="ice" && b.hpExtra>0){
+            b.hpExtra--;
+            if(b.hpExtra===0){b.type="normal";b.color=pickColor(b.type,b.value);}
+          }else if(b.type==="armor" && b.hpExtra>0){
+            b.hpExtra--;
+          }else{
+            b.value -= damagePerHit;
+          }
 
-          if(r < effBombChance) type = "bomb";
-          else if(r < effBombChance + 0.05) type = "ice";
-          else if(r < effBombChance + 0.10) type = "moving";
-          else if(r < effBombChance + 0.15) type = "armor";
+          if(b.value<=0){
+            b.alive=false;
+            score+=3;
+            playBeep(430,0.08);
+            if(b.type==="bomb"){
+              shake=10;
+              for(const nb of blocks){
+                if(!nb.alive||nb===b) continue;
+                const dx = Math.abs((nb.x+nb.w/2)-(b.x+b.w/2));
+                const dy = Math.abs((nb.y+nb.h/2)-(b.y+b.h/2));
+                if(dx<b.w*1.3 && dy<b.h*1.3){
+                  nb.value -= damagePerHit*2;
+                  if(nb.value<=0) nb.alive=false;
+                }
+              }
+            }
+          }else{
+            b.color = pickColor(b.type,b.value);
+            score+=1;
+          }
 
-          blocks.push({
-            x, y, w:blockWidth, h:blockHeight,
-            value: val,
-            type,
-            hpExtra: type==="ice" ? 1 : (type==="armor" ? 2 : 0),
-            color: pickColor(type, val),
-            alive: true,
-            vx: type === "moving"
-              ? (Math.random()<0.5 ? -1 : 1) *
-                (0.7 + level * 0.1) *
-                (0.9 + 0.13 * difficultyFactor)
-              : 0
-          });
+          if(score>bestScore) bestScore=score;
+          updateLabels();
         }
       }
 
-      if(Math.random() < 0.55){
-        const px = randInt(40, canvas.width - 40);
-        const py = padding + blockHeight + 12;
-        const types = ["extraBall","damageUp","bombUp"];
-        powerUps.push({x:px,y:py,r:10,type:types[randInt(0,2)],collected:false});
+      // برخورد با پاورآپ‌ها
+      for(const p of powerUps){
+        if(p.collected) continue;
+        const dx = ball.x - p.x;
+        const dy = ball.y - p.y;
+        if(Math.sqrt(dx*dx+dy*dy) < p.r+6){
+          p.collected=true;
+          applyPowerUp(p.type);
+        }
+      }
+
+      // برگشت توپ‌ها
+      if(ball.y>=canvas.height-6 && ball.vy>0){
+        ball.returned=true;
       }
     }
 
-    // 🔽 پایین آمدن بلوک‌ها با توجه به سختی
-    function moveBlocksDown(){
-      const baseRowHeight = blocks.length ? (blocks[0].h + padding) : 40;
+    trails = trails.filter(t=>--t.life>0);
+    blocks = blocks.filter(b=>b.alive);
+    powerUps = powerUps.filter(p=>!p.collected && p.y<canvas.height-30);
 
-      const levelFactor = 1 + (level - 1) * 0.35;
-      const waveFactor = 1 + Math.min(waves, 15) * 0.04;
-      const diffFactor = 0.92 + 0.12 * difficultyFactor;
+    // پایان نوبت → موج جدید
+    if(turnInProgress && !activeAny){
+      turnInProgress = false;
+      frame = 0;
+      waves++;
 
-      const moveAmount = baseRowHeight * levelFactor * waveFactor * diffFactor;
+      if(waves % 5 === 0){
+        level++;
+        flashHint("🎉 مرحله " + level + " شروع شد! سخت‌تر شد…");
+        playBeep(1100, 0.17);
+      }
 
-      for(const b of blocks) b.y += moveAmount;
-      for(const p of powerUps) p.y += moveAmount;
-    }
-
-    function updateLabels(){
-      scoreEl.textContent = score;
-      bestEl.textContent = bestScore;
-      levelLabel.textContent = level;
-    }
-
-    function resetGame(){
-      balls=[]; trails=[]; blocks=[]; powerUps=[];
-      score=0; level=1; waves=0;
-      numBalls=25; damagePerHit=1; bombChance=0.08;
-      turnInProgress=false; frame=0;
-      shake=0; isPaused=false; gameOver=false;
-      difficultyFactor = 1;
+      moveBlocksDown();
       spawnRow();
+
+      // چک گیم‌اور
+      for(const b of blocks){
+        if(b.y + b.h >= canvas.height - 20){
+          playBeep(200, 0.4);
+          if(score > bestScore) bestScore = score;
+          updateLabels();
+          gameOver = true;
+          gameOverScoreText.textContent = "امتیاز شما: " + score;
+          gameOverBestText.textContent = "بهترین رکورد: " + bestScore;
+          gameOverOverlay.style.display = "flex";
+          return;
+        }
+      }
+
       updateLabels();
     }
 
-    resetGame();
+    if(shake>0) shake--;
+  }
 
-    // 🎯 شلیک با سرعت وابسته به سختی
-    function shoot(angle){
-      balls=[]; trails=[];
-      const baseSpeed = 6 + level*0.4;
-      const speed = baseSpeed * (0.96 + 0.08 * difficultyFactor);
-      for(let i=0;i<numBalls;i++){
-        balls.push({
-          x:baseX,y:baseY,
-          vx:Math.cos(angle)*speed,
-          vy:Math.sin(angle)*speed,
-          delay:i*2,
-          active:false,
-          returned:false
-        });
-      }
-      turnInProgress=true;
-      frame=0;
-      playBeep(650,0.09);
+  function draw(){
+    const rnd = (min,max)=>Math.floor(Math.random()*(max-min+1))+min;
+    const ox = shake? rnd(-shake,shake):0;
+    const oy = shake? rnd(-shake,shake):0;
+    ctx.save();
+    ctx.translate(ox,oy);
+    ctx.clearRect(-ox,-oy,canvas.width,canvas.height);
+
+    const grad = ctx.createLinearGradient(0,0,0,canvas.height);
+    grad.addColorStop(0,"#1a1450");
+    grad.addColorStop(1,"#09051f");
+    ctx.fillStyle=grad;
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    ctx.textAlign="center";
+    ctx.textBaseline="middle";
+    ctx.font="bold 14px sans-serif";
+    for(const b of blocks){
+      ctx.fillStyle="rgba(0,0,0,0.4)";
+      ctx.fillRect(b.x+2,b.y+3,b.w,b.h);
+      const g = ctx.createLinearGradient(b.x,b.y,b.x,b.y+b.h);
+      g.addColorStop(0,b.color);
+      g.addColorStop(1,"#ffffff22");
+      ctx.fillStyle=g;
+      ctx.fillRect(b.x,b.y,b.w,b.h);
+      ctx.strokeStyle="#ffffff33";
+      ctx.lineWidth=1;
+      ctx.strokeRect(b.x+0.5,b.y+0.5,b.w-1,b.h-1);
+      ctx.fillStyle="#fff";
+      ctx.fillText(Math.max(1,Math.round(b.value)), b.x+b.w/2, b.y+b.h/2);
     }
 
-    function getCanvasPos(evt){
-      const rect = canvas.getBoundingClientRect();
-      let clientX, clientY;
-      if(evt.touches && evt.touches[0]){
-        clientX = evt.touches[0].clientX;
-        clientY = evt.touches[0].clientY;
-      }else if(evt.changedTouches && evt.changedTouches[0]){
-        clientX = evt.changedTouches[0].clientX;
-        clientY = evt.changedTouches[0].clientY;
-      }else{
-        clientX = evt.clientX;
-        clientY = evt.clientY;
-      }
-      const x = (clientX - rect.left) * (canvas.width / rect.width);
-      const y = (clientY - rect.top)  * (canvas.height / rect.height);
-      return {x,y};
-    }
-
-    function startAim(evt){
-      if(turnInProgress || isPaused || gameOver) return;
-      isAiming=true;
-      const p = getCanvasPos(evt);
-      aimX=p.x; aimY=p.y;
-    }
-
-    function moveAim(evt){
-      if(!isAiming || isPaused || gameOver) return;
-      const p = getCanvasPos(evt);
-      aimX=p.x; aimY=p.y;
-    }
-
-    function endAim(){
-      if(!isAiming || isPaused || gameOver) return;
-      isAiming=false;
-      let angle = Math.atan2(aimY-baseY, aimX-baseX);
-      if(angle>-0.15) angle=-0.15;
-      if(angle<-Math.PI+0.15) angle=-Math.PI+0.15;
-      shoot(angle);
-    }
-
-    canvas.addEventListener("mousedown", e=>startAim(e));
-    canvas.addEventListener("mousemove", e=>moveAim(e));
-    canvas.addEventListener("mouseup",   ()=>endAim());
-
-    canvas.addEventListener("touchstart", e=>{startAim(e); e.preventDefault();},{passive:false});
-    canvas.addEventListener("touchmove",  e=>{moveAim(e); e.preventDefault();},{passive:false});
-    canvas.addEventListener("touchend",   e=>{endAim();  e.preventDefault();},{passive:false});
-
-    function showShopMsg(text){
-      shopMessage.textContent = text;
-      shopMessage.classList.remove("shopMessageVisible");
-      void shopMessage.offsetWidth;
-      shopMessage.classList.add("shopMessageVisible");
-    }
-
-    function flashHint(text){
-      if(hintTimeout) clearTimeout(hintTimeout);
-      const old = hintEl.textContent;
-      hintEl.textContent = text;
-      hintTimeout = setTimeout(()=>{hintEl.textContent = old;}, 3000);
-    }
-
-    shopBtn.onclick = ()=>{ if(!turnInProgress && !gameOver) shopOverlay.style.display="flex"; };
-    closeShopBtn.onclick = ()=>shopOverlay.style.display="none";
-    shopOverlay.addEventListener("click",e=>{
-      if(e.target===shopOverlay) shopOverlay.style.display="none";
-    });
-
-    document.querySelectorAll(".shopItem button").forEach(btn=>{
-      btn.addEventListener("click", ()=>{
-        const item = btn.getAttribute("data-item");
-        let cost = 0;
-        if(item === "balls") cost = 450;
-        else if(item === "damage") cost = 750;
-        else if(item === "bomb") cost = 600;
-
-        if(score < cost){
-          showShopMsg("امتیاز کافی نداری 😅");
-          playBeep(200,0.1);
-          return;
-        }
-
-        score -= cost;
-        if(item==="balls"){
-          numBalls += 3;
-          flashHint("۳ توپ به مجموعه‌ات اضافه شد 🎯");
-        }else if(item==="damage"){
-          damagePerHit += 1;
-          flashHint("قدرت توپ‌ها بیشتر شد 🔥");
-        }else if(item==="bomb"){
-          bombChance += 0.03;
-          flashHint("شانس بلوک‌های بمب بالاتر رفت 💣");
-        }
-
-        const row = document.querySelector(`.shopItem[data-item-row="${item}"]`);
-        if(row){
-          row.classList.add("bought");
-          setTimeout(()=>row.classList.remove("bought"), 300);
-        }
-
-        showShopMsg("خرید با موفقیت انجام شد ✅");
-        playBeep(900,0.12);
-        updateLabels();
-      });
-    });
-
-    // درباره ما
-    aboutBtn.onclick = ()=>{aboutOverlay.style.display="flex";};
-    closeAboutBtn.onclick = ()=>{aboutOverlay.style.display="none";};
-    aboutOverlay.addEventListener("click",e=>{
-      if(e.target===aboutOverlay) aboutOverlay.style.display="none";
-    });
-
-    function applyPowerUp(type){
-      if(type==="extraBall"){
-        numBalls += 2;
-        flashHint("۲ توپ جایزه گرفتی! 😍");
-      }else if(type==="damageUp"){
-        damagePerHit += 1;
-        flashHint("قدرت ضربه توپ‌ها بیشتر شد 🔥");
-      }else if(type==="bombUp"){
-        bombChance += 0.03;
-        flashHint("از حالا بمب‌ها بیشتر می‌شن 💣");
-      }
-      playBeep(900,0.1);
-    }
-
-    pauseBtn.onclick = ()=>{
-      if(gameOver) return;
-      isPaused = !isPaused;
-      pauseBtn.textContent = isPaused ? "▶️" : "⏸";
-      flashHint(isPaused ? "بازی متوقف شد ⏸" : "ادامه بازی ▶️");
-    };
-
-    soundBtn.onclick = ()=>{
-      isMuted = !isMuted;
-      soundBtn.textContent = isMuted ? "🔇" : "🔊";
-    };
-
-    retryBtn.onclick = ()=>{
-      gameOverOverlay.style.display = "none";
-      resetGame();
-    };
-    gameOverOverlay.addEventListener("click", e=>{
-      if(e.target === gameOverOverlay){
-        gameOverOverlay.style.display="none";
-        resetGame();
-      }
-    });
-
-    function update(){
-      frame++;
-
-      for(const b of blocks){
-        if(b.type==="moving" && b.alive){
-          b.x += b.vx;
-          if(b.x<=padding || b.x+b.w>=canvas.width-padding) b.vx*=-1;
-        }
-      }
-
-      for(const p of powerUps){
-        if(!p.collected) p.y += 0.15;
-      }
-
-      let activeAny=false;
-      for(const ball of balls){
-        if(!ball.active && frame>=ball.delay) ball.active=true;
-        if(!ball.active || ball.returned) continue;
-        activeAny=true;
-
-        ball.x += ball.vx;
-        ball.y += ball.vy;
-
-        trails.push({x:ball.x,y:ball.y,life:18});
-
-        if(ball.x<=4 || ball.x>=canvas.width-4){
-          ball.vx*=-1;
-          ball.x = Math.max(4,Math.min(canvas.width-4,ball.x));
-        }
-        if(ball.y<=4){
-          ball.vy*=-1;
-          ball.y=4;
-        }
-
-        for(const b of blocks){
-          if(!b.alive) continue;
-          if(ball.x>b.x && ball.x<b.x+b.w && ball.y>b.y && ball.y<b.y+b.h){
-            const ol = ball.x - b.x;
-            const orr = (b.x+b.w)-ball.x;
-            const ot = ball.y - b.y;
-            const ob = (b.y+b.h)-ball.y;
-            const minO = Math.min(ol,orr,ot,ob);
-            if(minO===ol || minO===orr) ball.vx*=-1;
-            else ball.vy*=-1;
-
-            if(b.type==="ice" && b.hpExtra>0){
-              b.hpExtra--;
-              if(b.hpExtra===0){b.type="normal";b.color=pickColor(b.type,b.value);}
-            }else if(b.type==="armor" && b.hpExtra>0){
-              b.hpExtra--;
-            }else{
-              b.value -= damagePerHit;
-            }
-
-            if(b.value<=0){
-              b.alive=false;
-              score+=3;
-              playBeep(430,0.08);
-              if(b.type==="bomb"){
-                shake=10;
-                for(const nb of blocks){
-                  if(!nb.alive||nb===b) continue;
-                  const dx = Math.abs((nb.x+nb.w/2)-(b.x+b.w/2));
-                  const dy = Math.abs((nb.y+nb.h/2)-(b.y+b.h/2));
-                  if(dx<b.w*1.3 && dy<b.h*1.3){
-                    nb.value -= damagePerHit*2;
-                    if(nb.value<=0) nb.alive=false;
-                  }
-                }
-              }
-            }else{
-              b.color = pickColor(b.type,b.value);
-              score+=1;
-            }
-
-            if(score>bestScore) bestScore=score;
-            updateLabels();
-          }
-        }
-
-        for(const p of powerUps){
-          if(p.collected) continue;
-          const dx = ball.x - p.x;
-          const dy = ball.y - p.y;
-          if(Math.sqrt(dx*dx+dy*dy) < p.r+6){
-            p.collected=true;
-            applyPowerUp(p.type);
-          }
-        }
-
-        if(ball.y>=canvas.height-6 && ball.vy>0){
-          ball.returned=true;
-        }
-      }
-
-      trails = trails.filter(t=>--t.life>0);
-      blocks = blocks.filter(b=>b.alive);
-      powerUps = powerUps.filter(p=>!p.collected && p.y<canvas.height-30);
-
-      // 🔁 پایان نوبت، تنظیم سختی و ساخت موج بعدی
-      if(turnInProgress && !activeAny){
-        turnInProgress = false;
-        frame = 0;
-
-        const pressureBefore = boardPressure(); // چقدر به باخت نزدیک بودی؟
-
-        waves++;
-
-        if(waves % 5 === 0){
-          level++;
-          flashHint("🎉 مرحله " + level + " شروع شد! سخت‌تر شد…");
-          playBeep(1100, 0.17);
-        }
-
-        // به‌روزرسانی هوشمند سختی
-        recalcDifficulty();
-
-        // اگر اوضاع بحرانی بود (بلوک‌ها خیلی پایین بودند) کمی سختی رو کم کن
-        if(pressureBefore > 0.7){
-          difficultyFactor = Math.max(1, difficultyFactor - 0.12);
-        }
-
-        moveBlocksDown();
-        spawnRow();
-
-        for(const b of blocks){
-          if(b.y + b.h >= canvas.height - 20){
-            playBeep(200, 0.4);
-            if(score > bestScore) bestScore = score;
-            updateLabels();
-            gameOver = true;
-            gameOverScoreText.textContent = "امتیاز شما: " + score;
-            gameOverBestText.textContent = "بهترین رکورد: " + bestScore;
-            gameOverOverlay.style.display = "flex";
-            return;
-          }
-        }
-
-        updateLabels();
-      }
-
-      if(shake>0) shake--;
-    }
-
-    function draw(){
-      const rnd = (min,max)=>Math.floor(Math.random()*(max-min+1))+min;
-      const ox = shake? rnd(-shake,shake):0;
-      const oy = shake? rnd(-shake,shake):0;
-      ctx.save();
-      ctx.translate(ox,oy);
-      ctx.clearRect(-ox,-oy,canvas.width,canvas.height);
-
-      const grad = ctx.createLinearGradient(0,0,0,canvas.height);
-      grad.addColorStop(0,"#1a1450");
-      grad.addColorStop(1,"#09051f");
-      ctx.fillStyle=grad;
-      ctx.fillRect(0,0,canvas.width,canvas.height);
-
-      ctx.textAlign="center";
-      ctx.textBaseline="middle";
-      ctx.font="bold 14px sans-serif";
-      for(const b of blocks){
-        ctx.fillStyle="rgba(0,0,0,0.4)";
-        ctx.fillRect(b.x+2,b.y+3,b.w,b.h);
-        const g = ctx.createLinearGradient(b.x,b.y,b.x,b.y+b.h);
-        g.addColorStop(0,b.color);
-        g.addColorStop(1,"#ffffff22");
-        ctx.fillStyle=g;
-        ctx.fillRect(b.x,b.y,b.w,b.h);
-        ctx.strokeStyle="#ffffff33";
-        ctx.lineWidth=1;
-        ctx.strokeRect(b.x+0.5,b.y+0.5,b.w-1,b.h-1);
-        ctx.fillStyle="#fff";
-        ctx.fillText(Math.max(1,Math.round(b.value)), b.x+b.w/2, b.y+b.h/2);
-      }
-
-      for(const p of powerUps){
-        let colorOuter="#4cffb5";
-        let text="B";
-        if(p.type==="extraBall"){ colorOuter="#1abc9c"; text="+B"; }
-        else if(p.type==="damageUp"){ colorOuter="#ff9f43"; text="DMG"; }
-        else if(p.type==="bombUp"){ colorOuter="#9b59b6"; text="BOMB"; }
-
-        ctx.beginPath();
-        const g2 = ctx.createRadialGradient(p.x,p.y,2,p.x,p.y,p.r+4);
-        g2.addColorStop(0,"#ffffff");
-        g2.addColorStop(1,colorOuter);
-        ctx.fillStyle=g2;
-        ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-        ctx.fill();
-        ctx.strokeStyle="#ffffffaa";
-        ctx.lineWidth=1;
-        ctx.stroke();
-
-        ctx.fillStyle="#003";
-        ctx.font="9px sans-serif";
-        ctx.fillText(text,p.x,p.y+0.5);
-      }
-
-      for(const t of trails){
-        ctx.beginPath();
-        const alpha = t.life/18;
-        ctx.fillStyle=`rgba(255,255,255,${alpha})`;
-        ctx.arc(t.x,t.y,3,0,Math.PI*2);
-        ctx.fill();
-      }
-
-      ctx.fillStyle="#ffffff";
-      for(const ball of balls){
-        if(!ball.active || ball.returned) continue;
-        ctx.beginPath();
-        ctx.arc(ball.x,ball.y,4,0,Math.PI*2);
-        ctx.fill();
-      }
+    for(const p of powerUps){
+      let colorOuter="#4cffb5";
+      let text="B";
+      if(p.type==="extraBall"){ colorOuter="#1abc9c"; text="+B"; }
+      else if(p.type==="damageUp"){ colorOuter="#ff9f43"; text="DMG"; }
+      else if(p.type==="bombUp"){ colorOuter="#9b59b6"; text="BOMB"; }
 
       ctx.beginPath();
-      ctx.arc(baseX,baseY,6,0,Math.PI*2);
-      ctx.fillStyle="#ffffff";
+      const g2 = ctx.createRadialGradient(p.x,p.y,2,p.x,p.y,p.r+4);
+      g2.addColorStop(0,"#ffffff");
+      g2.addColorStop(1,colorOuter);
+      ctx.fillStyle=g2;
+      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
       ctx.fill();
+      ctx.strokeStyle="#ffffffaa";
+      ctx.lineWidth=1;
+      ctx.stroke();
 
-      if(!turnInProgress && isAiming){
-        ctx.setLineDash([5,5]);
-        ctx.strokeStyle="#ffffffbb";
-        ctx.beginPath();
-        ctx.moveTo(baseX,baseY);
-        ctx.lineTo(aimX,aimY);
-        ctx.stroke();
-        ctx.setLineDash([]);
-      }
-
-      ctx.restore();
+      ctx.fillStyle="#003";
+      ctx.font="9px sans-serif";
+      ctx.fillText(text,p.x,p.y+0.5);
     }
 
-    function loop(){
-      if(!isPaused && !gameOver){
-        update();
-      }
-      draw();
-      requestAnimationFrame(loop);
+    for(const t of trails){
+      ctx.beginPath();
+      const alpha = t.life/18;
+      ctx.fillStyle=`rgba(255,255,255,${alpha})`;
+      ctx.arc(t.x,t.y,3,0,Math.PI*2);
+      ctx.fill();
     }
-    loop();
-  </script>
+
+    ctx.fillStyle="#ffffff";
+    for(const ball of balls){
+      if(!ball.active || ball.returned) continue;
+      ctx.beginPath();
+      ctx.arc(ball.x,ball.y,4,0,Math.PI*2);
+      ctx.fill();
+    }
+
+    ctx.beginPath();
+    ctx.arc(baseX,baseY,6,0,Math.PI*2);
+    ctx.fillStyle="#ffffff";
+    ctx.fill();
+
+    if(!turnInProgress && isAiming){
+      ctx.setLineDash([5,5]);
+      ctx.strokeStyle="#ffffffbb";
+      ctx.beginPath();
+      ctx.moveTo(baseX,baseY);
+      ctx.lineTo(aimX,aimY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    ctx.restore();
+  }
+
+  function loop(){
+    if(!isPaused && !gameOver){
+      update();
+    }
+    draw();
+    requestAnimationFrame(loop);
+  }
+  loop();
+</script>
 </body>
 </html>
