@@ -132,22 +132,32 @@ body{
 #game-container{
   width:100%;
   max-width:900px;
-  flex:1;
   display:flex;
   justify-content:center;
-  align-items:center;
-  padding:0 12px;
+  align-items:flex-start;
+  padding:0 8px;
+  margin-top:10px;
+  flex:0;
 }
 
 canvas{
   width:100%;
-  max-width:420px;      /* بازی پهن‌تر روی موبایل */
+  max-width:460px;
   background:#16103f;
   border-radius:14px;
   box-shadow:0 0 18px rgba(0,0,0,.7);
-  margin-top:8px;
+  margin-bottom:20px;
 }
 
+@media (max-width:600px){
+  #game-container{
+    padding:0 4px;
+    margin-top:5px;
+  }
+  canvas{
+    max-width:100%;
+  }
+}
 
 
 #hint-bar{
