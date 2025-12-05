@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>توپ‌بارون</title>
 
+  <!-- فونت و استایل -->
   <style>
 *{
   margin:0;
@@ -35,7 +36,7 @@ body{
   gap:12px;
 }
 
-/* چپ: شاپ + درباره ما */
+/* چپ: شاپ + کانال طاویتا (قبلاً درباره ما بود) */
 #top-left{
   display:flex;
   gap:10px;
@@ -159,7 +160,6 @@ canvas{
   }
 }
 
-
 #hint-bar{
   width:100%;
   max-width:900px;
@@ -179,7 +179,7 @@ canvas{
   opacity:.95;
 }
 
-/* ───────── پاپ‌آپ‌ها ───────── */
+/* ───────── پاپ‌آپ‌ها (فقط شاپ و گیم‌اور) ───────── */
 
 .overlay{
   position:fixed;
@@ -274,39 +274,30 @@ canvas{
   100%{opacity:0;transform:translateY(-6px);}
 }
 
-/* دکمه لینک در درباره‌ما */
-.linkButton{
-  display:inline-block;
-  margin-top:10px;
-  padding:6px 14px;
-  border-radius:999px;
-  text-decoration:none;
-  font-size:12px;
-  background:#1abc9c;
-  color:#fff;
-  box-shadow:0 0 10px rgba(0,0,0,.5);
-}
-
 /* ───────── موبایل ───────── */
 
 @media(max-width:480px){
   #gameLogo{width:70px;height:70px;}
   #gameTitle{font-size:18px;}
-  canvas{max-width:100%;}   /* 👈 بذار این باشه */
+  canvas{max-width:100%;}
   #scoreLabel{font-size:18px;}
   .topBtn{padding:6px 12px;font-size:13px;}
   #status-inner{gap:10px;}
 }
-</style>
+  </style>
+
+  <!-- SDK ایتا -->
+  <script src="https://developer.eitaa.com/eitaa-web-app.js"></script>
 </head>
 
 <body>
 
-  <!-- ردیف بالا: شاپ / درباره + لوگو / عنوان -->
+  <!-- ردیف بالا: شاپ / کانال طاویتا + لوگو / عنوان -->
   <div id="top-bar">
     <div id="top-left">
       <button id="shopBtn" class="topBtn">شاپ</button>
-      <button id="aboutBtn" class="topBtn">درباره ما</button>
+      <!-- قبلاً: درباره ما -->
+      <button id="aboutBtn" class="topBtn">کانال طاویتا</button>
     </div>
 
     <div id="top-right">
@@ -323,24 +314,24 @@ canvas{
 
   <!-- ردیف وضعیت: BEST / LVL / امتیاز / آیکون‌ها -->
   <div id="status-bar">
-  <div id="status-inner">
-    <div id="stats-row">
-      <span>BEST: <span id="bestScore">0</span></span>
-      <span>LVL: <span id="levelLabel">1</span></span>
-    </div>
+    <div id="status-inner">
+      <div id="stats-row">
+        <span>BEST: <span id="bestScore">0</span></span>
+        <span>LVL: <span id="levelLabel">1</span></span>
+      </div>
 
-    <div id="scoreLabel">
-      امتیاز: <span id="currentScore">0</span>
-    </div>
+      <div id="scoreLabel">
+        امتیاز: <span id="currentScore">0</span>
+      </div>
 
-    <div id="icons-row">
-      <button id="soundBtn" class="iconBtn">🔊</button>
-      <button id="pauseBtn" class="iconBtn">⏸</button>
+      <div id="icons-row">
+        <button id="soundBtn" class="iconBtn">🔊</button>
+        <button id="pauseBtn" class="iconBtn">⏸</button>
+      </div>
     </div>
   </div>
-</div>
 
- <div id="bottom-bar">
+  <div id="bottom-bar">
     <div id="hint">برای هدف‌گیری لمس کن و زاویه را انتخاب کن 🎯</div>
   </div>
   
@@ -348,8 +339,6 @@ canvas{
   <div id="game-container">
     <canvas id="game"></canvas>
   </div>
-
-  
 
   <!-- شاپ -->
   <div id="shopOverlay" class="overlay">
@@ -379,31 +368,6 @@ canvas{
     </div>
   </div>
 
-  <!-- درباره ما -->
-  <div id="aboutOverlay" class="overlay">
-    <div class="box">
-      <h3>درباره طاویتا</h3>
-      <p>
-        طاویتا یک کانال آموزش تولید محتوا و هوش مصنوعی است که با رویکردی
-        حرفه‌ای اما صمیمی، به شما کمک می‌کند محتوای مؤثر، خلاق و
-        درآمدزا بسازید.
-      </p>
-      <p>
-        در کنار آموزش، تیم طاویتا انجام پروژه‌های تخصصی مثل ساخت ویدئو،
-        طراحی بازی، تولید محتوای شبکه‌های اجتماعی و اجرای ایده‌های
-        خلاقانه را نیز می‌پذیرد.
-      </p>
-      <p>
-        برای همراهی با طاویتا و دیدن آموزش‌ها و پروژه‌ها، می‌توانید از
-        طریق لینک زیر عضو کانال شوید:
-      </p>
-      <a class="linkButton" href="https://eitaa.com/tavita" target="_blank">
-        ورود به کانال طاویتا در ایتا
-      </a>
-      <button class="closeBtn" id="closeAbout">بستن</button>
-    </div>
-  </div>
-
   <!-- گیم‌اور -->
   <div id="gameOverOverlay" class="overlay">
     <div class="box" id="gameOverBox">
@@ -415,8 +379,8 @@ canvas{
     </div>
   </div>
 
-  <!-- ───────────── اسکریپت بازی (همون کد خودت) ───────────── -->
-<script>
+  <!-- ───────────── اسکریپت بازی ───────────── -->
+  <script>
   const canvas = document.getElementById("game");
   const ctx = canvas.getContext("2d");
 
@@ -438,9 +402,7 @@ canvas{
   const shopOverlay = document.getElementById("shopOverlay");
   const shopBtn = document.getElementById("shopBtn");
   const closeShopBtn = document.getElementById("closeShop");
-  const aboutOverlay = document.getElementById("aboutOverlay");
   const aboutBtn = document.getElementById("aboutBtn");
-  const closeAboutBtn = document.getElementById("closeAbout");
   const shopMessage = document.getElementById("shopMessage");
   const hintEl = document.getElementById("hint");
 
@@ -480,9 +442,9 @@ canvas{
   let score = 0, bestScore = 0;
   let level = 1;
   let waves = 0;
-  let numBalls = 18;          // 👈 توپ‌های کمتر → بازی سخت‌تر
+  let numBalls = 18;
   let damagePerHit = 1;
-  let bombChance = 0.10;      // 👈 کمی بیشتر از قبل
+  let bombChance = 0.10;
   let turnInProgress = false;
   let frame = 0;
   let shake = 0;
@@ -507,35 +469,30 @@ canvas{
     return "#ff5555";
   }
 
-  // ───── ساخت ردیف جدید بلوک‌ها (نسخه سخت‌تر) ─────
   function spawnRow(){
     const blockWidth = (canvas.width - (cols+1)*padding)/cols;
     const blockHeight = blockWidth * .7;
 
-    // شانس ایجاد بلوک در هر ستون – عمداً بالا گذاشتم تا بازی شلوغ باشه
-    // با افزایش level و waves بیشتر هم می‌شه
     const spawnBase = 0.82 + level*0.03 + waves*0.02;
-    const spawnChance = Math.min(0.97, spawnBase);  // حداکثر ۹۷٪ هر ستون
+    const spawnChance = Math.min(0.97, spawnBase);
 
     for(let c=0; c<cols; c++){
       if(Math.random() < spawnChance){
         const x = padding + c*(blockWidth+padding);
         const y = padding;
 
-        // پایه HP مثل نسخه خودت
         const base = 5 + (level * 3) + (waves * 2);
         const multiplier = 1 + (level * 0.15);
         const spread = 5 + level * 3;
         let val = base + randInt(0, spread);
 
-        // 👇 سختی اضافه: بر اساس level و waves مقدار HP رو تقویت کن
         const difficultyBoost = 1 + (level-1)*0.28 + waves*0.18;
         val = Math.floor(val * multiplier * difficultyBoost);
 
         let type = "normal";
         const r = Math.random();
         const effBombChance = Math.min(
-          0.40,                                  // حداکثر ۴۰٪
+          0.40,
           bombChance + level * 0.02 + waves*0.01
         );
 
@@ -551,7 +508,6 @@ canvas{
           hpExtra: type==="ice" ? 1 : (type==="armor" ? 2 : 0),
           color: pickColor(type, val),
           alive: true,
-          // 👇 بلوک‌های متحرک سریع‌تر از نسخه قبلی
           vx: type === "moving"
             ? (Math.random()<0.5 ? -1 : 1) * (1.1 + level * 0.18)
             : 0
@@ -559,7 +515,6 @@ canvas{
       }
     }
 
-    // پاورآپ مثل قبل
     if(Math.random() < 0.55){
       const px = randInt(40, canvas.width - 40);
       const py = padding + blockHeight + 12;
@@ -568,14 +523,10 @@ canvas{
     }
   }
 
-  // ───── پایین آمدن ردیف‌ها (بیشتر از قبل → سخت‌تر) ─────
   function moveBlocksDown(){
     const baseRowHeight = blocks.length ? (blocks[0].h + padding) : 40;
-
     const levelFactor = 1 + (level - 1) * 0.4;
     const waveFactor = 1 + Math.min(waves, 20) * 0.06;
-
-    // 👇 کلید سخت‌تر شدن
     const moveAmount = baseRowHeight * levelFactor * waveFactor * 1.25;
 
     for(const b of blocks) b.y += moveAmount;
@@ -602,10 +553,9 @@ canvas{
 
   resetGame();
 
-  // ───── شلیک توپ‌ها (سرعت بیشتر → بازی شلوغ‌تر) ─────
   function shoot(angle){
     balls=[]; trails=[];
-    const speed = 7.2 + level*0.55;   // 👈 سریع‌تر از نسخه قبلی
+    const speed = 7.2 + level*0.55;
     for(let i=0;i<numBalls;i++){
       balls.push({
         x:baseX,y:baseY,
@@ -727,12 +677,25 @@ canvas{
     });
   });
 
-  // درباره ما
-  aboutBtn.onclick = ()=>{aboutOverlay.style.display="flex";};
-  closeAboutBtn.onclick = ()=>{aboutOverlay.style.display="none";};
-  aboutOverlay.addEventListener("click",e=>{
-    if(e.target===aboutOverlay) aboutOverlay.style.display="none";
-  });
+  // 🔹 تابع کمکی برای باز کردن لینک کانال (با SDK یا بدونش)
+  function openTavitaChannel(){
+    const url = "https://eitaa.com/tavita";
+
+    if (window.Eitaa && window.Eitaa.WebApp && typeof window.Eitaa.WebApp.openEitaaLink === "function") {
+      try {
+        window.Eitaa.WebApp.openEitaaLink(url);
+        return;
+      } catch (e) {
+        console.warn("openEitaaLink failed, fallback to location", e);
+      }
+    }
+
+    // اگر داخل ایتا نبودیم / SDK در دسترس نبود
+    window.location.href = url;
+  }
+
+  // 🔹 دکمه کانال طاویتا (جای پاپ‌آپ درباره ما)
+  aboutBtn.onclick = openTavitaChannel;
 
   function applyPowerUp(type){
     if(type==="extraBall"){
@@ -774,7 +737,6 @@ canvas{
   function update(){
     frame++;
 
-    // حرکت بلوک‌های متحرک
     for(const b of blocks){
       if(b.type==="moving" && b.alive){
         b.x += b.vx;
@@ -782,7 +744,6 @@ canvas{
       }
     }
 
-    // حرکت جزئی پاورآپ‌ها به پایین
     for(const p of powerUps){
       if(!p.collected) p.y += 0.15;
     }
@@ -807,7 +768,6 @@ canvas{
         ball.y=4;
       }
 
-      // برخورد با بلوک‌ها
       for(const b of blocks){
         if(!b.alive) continue;
         if(ball.x>b.x && ball.x<b.x+b.w && ball.y>b.y && ball.y<b.y+b.h){
@@ -854,7 +814,6 @@ canvas{
         }
       }
 
-      // برخورد با پاورآپ‌ها
       for(const p of powerUps){
         if(p.collected) continue;
         const dx = ball.x - p.x;
@@ -865,7 +824,6 @@ canvas{
         }
       }
 
-      // برگشت توپ‌ها
       if(ball.y>=canvas.height-6 && ball.vy>0){
         ball.returned=true;
       }
@@ -875,7 +833,6 @@ canvas{
     blocks = blocks.filter(b=>b.alive);
     powerUps = powerUps.filter(p=>!p.collected && p.y<canvas.height-30);
 
-    // پایان نوبت → موج جدید
     if(turnInProgress && !activeAny){
       turnInProgress = false;
       frame = 0;
@@ -890,7 +847,6 @@ canvas{
       moveBlocksDown();
       spawnRow();
 
-      // چک گیم‌اور
       for(const b of blocks){
         if(b.y + b.h >= canvas.height - 20){
           playBeep(200, 0.4);
@@ -1007,6 +963,6 @@ canvas{
     requestAnimationFrame(loop);
   }
   loop();
-</script>
+  </script>
 </body>
 </html>
