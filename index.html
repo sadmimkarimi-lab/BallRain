@@ -375,6 +375,17 @@ canvas{
       <p id="gameOverScoreText">امتیاز شما: 0</p>
       <p id="gameOverBestText" style="font-size:12px;opacity:.85;"></p>
       <p style="font-size:12px;opacity:.9;">می‌تونی دوباره تلاش کنی و رکورد خودت رو بشکنی 😎</p>
+    
+      <div style="margin:10px 0 6px;">
+  <img
+    id="gameOverAdImage"
+    src="https://cdnfa.com/irangiah/a9be/uploads/ads/tankads.webp"
+    alt="تبلیغ"
+    style="width:100%;border-radius:14px;cursor:pointer;display:block;"
+  />
+</div>
+      
+      
       <button class="closeBtn" id="retryBtn">دوباره تلاش کن</button>
     </div>
   </div>
@@ -432,6 +443,47 @@ canvas{
   const gameOverBestText = document.getElementById("gameOverBestText");
   const retryBtn = document.getElementById("retryBtn");
 
+// ───────── تبلیغات (مثل تانکیتا) ─────────
+const AD_IMAGE = "https://cdnfa.com/irangiah/a9be/uploads/ads/tankads.webp";
+const AD_LINK  = "https://eitaa.com/tavita_ads"; // کانال تبلیغات (فعلا)
+
+function openAdLink(){
+  if (window.Eitaa && window.Eitaa.WebApp && typeof window.Eitaa.WebApp.openEitaaLink === "function") {
+    try { window.Eitaa.WebApp.openEitaaLink(AD_LINK); return; } catch(e){}
+  }
+  window.location.href = AD_LINK;
+}
+
+// المنت‌های پاپ‌آپ تبلیغ مکث
+const adOverlay  = document.getElementById("adOverlay");
+const closeAdBtn = document.getElementById("closeAdBtn");
+const adImage    = document.getElementById("adImage");
+
+// ست کردن عکس + کلیک‌ها
+if (adImage) {
+  adImage.src = AD_IMAGE;
+  adImage.onclick = openAdLink;
+}
+if (closeAdBtn) closeAdBtn.onclick = ()=>{ if(adOverlay) adOverlay.style.display="none"; };
+if (adOverlay) {
+  adOverlay.addEventListener("click", (e)=>{
+    if(e.target === adOverlay) adOverlay.style.display="none";
+  });
+}
+
+function showPauseAd(){
+  if(!adOverlay) return;
+  adOverlay.style.display = "flex";
+}
+
+    
+// تبلیغ داخل گیم‌اور
+const gameOverAdImage = document.getElementById("gameOverAdImage");
+if (gameOverAdImage) {
+  gameOverAdImage.src = AD_IMAGE;
+  gameOverAdImage.onclick = openAdLink;
+}
+    
   let audioCtx;
   let isMuted = false;
   function playBeep(freq=600, dur=0.07){
@@ -730,11 +782,20 @@ canvas{
   }
 
   pauseBtn.onclick = ()=>{
-    if(gameOver) return;
-    isPaused = !isPaused;
-    pauseBtn.textContent = isPaused ? "▶️" : "⏸";
-    flashHint(isPaused ? "بازی متوقف شد ⏸" : "ادامه بازی ▶️");
-  };
+  if(gameOver) return;
+
+  isPaused = !isPaused;
+  pauseBtn.textContent = isPaused ? "▶️" : "⏸";
+  flashHint(isPaused ? "بازی متوقف شد ⏸" : "ادامه بازی ▶️");
+
+  // وقتی مکث شد، تبلیغ رو نشون بده
+  if(isPaused){
+    showPauseAd();
+  } else {
+    // وقتی از مکث خارج شد، تبلیغ بسته باشه
+    if(adOverlay) adOverlay.style.display = "none";
+  }
+};
 
   soundBtn.onclick = ()=>{
     isMuted = !isMuted;
