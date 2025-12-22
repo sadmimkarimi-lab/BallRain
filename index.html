@@ -5,285 +5,258 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>توپ‌بارون</title>
 
-  <!-- فونت و استایل -->
   <style>
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:'Vazirmatn',sans-serif;
-}
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:'Vazirmatn',sans-serif;
+    }
 
-body{
-  background:#0f0d33;
-  color:#fff;
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  overflow-x:hidden;
-}
+    body{
+      background:#0f0d33;
+      color:#fff;
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      overflow-x:hidden;
+    }
 
-/* ───────── ردیف بالایی: منو + لوگو ───────── */
+    /* ───────── ردیف بالایی ───────── */
+    #top-bar{
+      width:100%;
+      max-width:900px;
+      padding:12px 16px 4px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+    }
 
-#top-bar{
-  width:100%;
-  max-width:900px;
-  padding:12px 16px 4px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:12px;
-}
+    #top-left{ display:flex; gap:10px; }
 
-/* چپ: شاپ + کانال طاویتا (قبلاً درباره ما بود) */
-#top-left{
-  display:flex;
-  gap:10px;
-}
-.topBtn{
-  border:none;
-  padding:8px 16px;
-  font-size:14px;
-  border-radius:999px;
-  cursor:pointer;
-  color:#fff;
-  background:#ff8c00;
-  box-shadow:0 0 6px rgba(0,0,0,.4);
-  white-space:nowrap;
-}
-#aboutBtn{
-  background:#1abc9c;
-}
+    .topBtn{
+      border:none;
+      padding:8px 16px;
+      font-size:14px;
+      border-radius:999px;
+      cursor:pointer;
+      color:#fff;
+      background:#ff8c00;
+      box-shadow:0 0 6px rgba(0,0,0,.4);
+      white-space:nowrap;
+    }
+    #aboutBtn{ background:#1abc9c; }
 
-/* راست: لوگو + عنوان */
-#top-right{
-  display:flex;
-  justify-content:flex-end;
-  flex:1;
-}
-#logoArea{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  direction:rtl;
-}
-#gameLogo{
-  width:70px;
-  height:70px;
-  border-radius:999px;
-  object-fit:cover;
-  box-shadow:0 0 8px rgba(0,0,0,.5);
-}
-#gameTitle{
-  font-size:20px;
-  font-weight:800;
-  white-space:nowrap;
-}
+    #top-right{
+      display:flex;
+      justify-content:flex-end;
+      flex:1;
+    }
+    #logoArea{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      direction:rtl;
+    }
+    #gameLogo{
+      width:70px;
+      height:70px;
+      border-radius:999px;
+      object-fit:cover;
+      box-shadow:0 0 8px rgba(0,0,0,.5);
+    }
+    #gameTitle{
+      font-size:20px;
+      font-weight:800;
+      white-space:nowrap;
+    }
 
-/* ───────── ردیف وضعیت: BEST / LVL / امتیاز / دکمه‌ها ───────── */
+    /* ───────── ردیف وضعیت ───────── */
+    #status-bar{
+      width:100%;
+      max-width:900px;
+      padding:0 16px 8px;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+    }
 
-#status-bar{
-  width:100%;
-  max-width:900px;
-  padding:0 16px 8px;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-}
+    #status-inner{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:16px;
+      flex-wrap:nowrap;
+    }
 
-#status-inner{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:16px;
-  flex-wrap:nowrap;
-}
+    #stats-row{
+      display:flex;
+      gap:10px;
+      font-size:14px;
+      white-space:nowrap;
+    }
 
-#stats-row{
-  display:flex;
-  gap:10px;
-  font-size:14px;
-  white-space:nowrap;
-}
+    #scoreLabel{
+      font-size:20px;
+      font-weight:700;
+      white-space:nowrap;
+    }
 
-#scoreLabel{
-  font-size:20px;
-  font-weight:700;
-  white-space:nowrap;
-}
+    #icons-row{ display:flex; gap:8px; }
+    .iconBtn{
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:18px;
+      background:#262a7a;
+      color:#fff;
+      border:none;
+      box-shadow:0 0 5px rgba(0,0,0,.4);
+      cursor:pointer;
+    }
 
-#icons-row{
-  display:flex;
-  gap:8px;
-}
-.iconBtn{
-  padding:6px 10px;
-  border-radius:999px;
-  font-size:18px;
-  background:#262a7a;
-  color:#fff;
-  border:none;
-  box-shadow:0 0 5px rgba(0,0,0,.4);
-  cursor:pointer;
-}
+    /* ───────── هینت ───────── */
+    #bottom-bar{
+      width:100%;
+      max-width:900px;
+      padding:8px 16px 0;
+      display:flex;
+      justify-content:center;
+    }
+    #hint{
+      width:100%;
+      background:#111827;
+      padding:10px 14px;
+      border-radius:12px;
+      font-size:14px;
+      direction:rtl;
+      text-align:right;
+      opacity:.95;
+    }
 
-/* ───────── بازی / کانواس ───────── */
+    /* ───────── کانواس ───────── */
+    #game-container{
+      width:100%;
+      max-width:900px;
+      display:flex;
+      justify-content:center;
+      align-items:flex-start;
+      padding:0 8px;
+      margin-top:10px;
+      flex:0;
+    }
 
-#game-container{
-  width:100%;
-  max-width:900px;
-  display:flex;
-  justify-content:center;
-  align-items:flex-start;
-  padding:0 8px;
-  margin-top:10px;
-  flex:0;
-}
+    canvas{
+      width:100%;
+      max-width:460px;
+      background:#16103f;
+      border-radius:14px;
+      box-shadow:0 0 18px rgba(0,0,0,.7);
+      margin-bottom:20px;
+    }
 
-canvas{
-  width:100%;
-  max-width:460px;
-  background:#16103f;
-  border-radius:14px;
-  box-shadow:0 0 18px rgba(0,0,0,.7);
-  margin-bottom:20px;
-}
+    @media (max-width:600px){
+      #game-container{ padding:0 4px; margin-top:5px; }
+      canvas{ max-width:100%; }
+    }
 
-@media (max-width:600px){
-  #game-container{
-    padding:0 4px;
-    margin-top:5px;
-  }
-  canvas{
-    max-width:100%;
-  }
-}
+    /* ───────── پاپ‌آپ‌ها ───────── */
+    .overlay{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.7);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:10;
+    }
 
-#hint-bar{
-  width:100%;
-  max-width:900px;
-  padding:8px 16px 0;
-  display:flex;
-  justify-content:center;
-}
+    .box{
+      background:#1e124f;
+      padding:16px;
+      border-radius:16px;
+      width:90%;
+      max-width:380px;
+      text-align:right;
+      direction:rtl;
+      font-size:13px;
+      line-height:1.7;
+      color:#f9fafb;
+      box-shadow:0 0 18px rgba(0,0,0,.8);
+      position:relative;
+    }
 
-#hint{
-  width:100%;
-  background:#111827;
-  padding:10px 14px;
-  border-radius:12px;
-  font-size:14px;
-  direction:rtl;
-  text-align:right;
-  opacity:.95;
-}
+    .box h3{
+      margin-bottom:8px;
+      font-size:16px;
+    }
 
-/* ───────── پاپ‌آپ‌ها (فقط شاپ و گیم‌اور) ───────── */
+    .closeBtn{
+      width:100%;
+      border:none;
+      padding:7px 14px;
+      border-radius:999px;
+      background:#4444aa;
+      color:#fff;
+      margin-top:10px;
+      cursor:pointer;
+      box-shadow:0 0 8px rgba(0,0,0,.5);
+    }
+    .closeBtn:active{ transform:scale(.97); }
 
-.overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.7);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:10;
-}
+    /* ───────── شاپ ───────── */
+    .shopItem{
+      background:#24145f;
+      padding:8px;
+      border-radius:10px;
+      margin:6px 0;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      font-size:13px;
+      transition:transform .15s ease, box-shadow .15s ease;
+    }
+    .shopItem span{ display:block; }
+    .shopItem button{
+      padding:4px 10px;
+      border:0;
+      border-radius:999px;
+      background:#ff8c00;
+      color:white;
+      cursor:pointer;
+      font-size:11px;
+    }
+    .shopItem.bought{
+      transform:scale(1.03);
+      box-shadow:0 0 14px rgba(46,204,113,.8);
+    }
 
-.box{
-  background:#1e124f;
-  padding:16px;
-  border-radius:16px;
-  width:90%;
-  max-width:380px;
-  text-align:right;
-  direction:rtl;
-  font-size:13px;
-  line-height:1.7;
-  color:#f9fafb;
-  box-shadow:0 0 18px rgba(0,0,0,.8);
-  position:relative;
-}
+    #shopMessage{
+      position:absolute;
+      top:4px;
+      left:12px;
+      font-size:11px;
+      color:#2ecc71;
+      opacity:0;
+      pointer-events:none;
+    }
+    .shopMessageVisible{ animation:shopFlash 1s ease-out forwards; }
+    @keyframes shopFlash{
+      0%{opacity:0;transform:translateY(-4px);}
+      20%{opacity:1;transform:translateY(0);}
+      80%{opacity:1;}
+      100%{opacity:0;transform:translateY(-6px);}
+    }
 
-.box h3{
-  margin-bottom:8px;
-  font-size:16px;
-}
-
-.closeBtn{
-  width:100%;
-  border:none;
-  padding:7px 14px;
-  border-radius:999px;
-  background:#4444aa;
-  color:#fff;
-  margin-top:10px;
-  cursor:pointer;
-  box-shadow:0 0 8px rgba(0,0,0,.5);
-}
-.closeBtn:active{
-  transform:scale(.97);
-}
-
-/* آیتم‌های شاپ */
-.shopItem{
-  background:#24145f;
-  padding:8px;
-  border-radius:10px;
-  margin:6px 0;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  font-size:13px;
-  transition:transform .15s ease, box-shadow .15s ease;
-}
-.shopItem span{
-  display:block;
-}
-.shopItem button{
-  padding:4px 10px;
-  border:0;
-  border-radius:999px;
-  background:#ff8c00;
-  color:white;
-  cursor:pointer;
-  font-size:11px;
-}
-.shopItem.bought{
-  transform:scale(1.03);
-  box-shadow:0 0 14px rgba(46,204,113,.8);
-}
-
-#shopMessage{
-  position:absolute;
-  top:4px;
-  left:12px;
-  font-size:11px;
-  color:#2ecc71;
-  opacity:0;
-  pointer-events:none;
-}
-.shopMessageVisible{
-  animation:shopFlash 1s ease-out forwards;
-}
-@keyframes shopFlash{
-  0%{opacity:0;transform:translateY(-4px);}
-  20%{opacity:1;transform:translateY(0);}
-  80%{opacity:1;}
-  100%{opacity:0;transform:translateY(-6px);}
-}
-
-/* ───────── موبایل ───────── */
-
-@media(max-width:480px){
-  #gameLogo{width:70px;height:70px;}
-  #gameTitle{font-size:18px;}
-  canvas{max-width:100%;}
-  #scoreLabel{font-size:18px;}
-  .topBtn{padding:6px 12px;font-size:13px;}
-  #status-inner{gap:10px;}
-}
+    @media(max-width:480px){
+      #gameLogo{width:70px;height:70px;}
+      #gameTitle{font-size:18px;}
+      canvas{max-width:100%;}
+      #scoreLabel{font-size:18px;}
+      .topBtn{padding:6px 12px;font-size:13px;}
+      #status-inner{gap:10px;}
+    }
   </style>
 
   <!-- SDK ایتا -->
@@ -292,27 +265,20 @@ canvas{
 
 <body>
 
-  <!-- ردیف بالا: شاپ / کانال طاویتا + لوگو / عنوان -->
   <div id="top-bar">
     <div id="top-left">
       <button id="shopBtn" class="topBtn">شاپ</button>
-      <!-- قبلاً: درباره ما -->
       <button id="aboutBtn" class="topBtn">کانال طاویتا</button>
     </div>
 
     <div id="top-right">
       <div id="logoArea">
-        <img
-          id="gameLogo"
-          src="https://cdnfa.com/irangiah/a9be/uploads/bazi2/logoball.webp"
-          alt="توپ‌بارون"
-        />
+        <img id="gameLogo" src="https://cdnfa.com/irangiah/a9be/uploads/bazi2/logoball.webp" alt="توپ‌بارون" />
         <div id="gameTitle">توپ‌بارون</div>
       </div>
     </div>
   </div>
 
-  <!-- ردیف وضعیت: BEST / LVL / امتیاز / آیکون‌ها -->
   <div id="status-bar">
     <div id="status-inner">
       <div id="stats-row">
@@ -334,8 +300,7 @@ canvas{
   <div id="bottom-bar">
     <div id="hint">برای هدف‌گیری لمس کن و زاویه را انتخاب کن 🎯</div>
   </div>
-  
-  <!-- بازی -->
+
   <div id="game-container">
     <canvas id="game"></canvas>
   </div>
@@ -375,673 +340,692 @@ canvas{
       <p id="gameOverScoreText">امتیاز شما: 0</p>
       <p id="gameOverBestText" style="font-size:12px;opacity:.85;"></p>
       <p style="font-size:12px;opacity:.9;">می‌تونی دوباره تلاش کنی و رکورد خودت رو بشکنی 😎</p>
-    
+
       <div style="margin:10px 0 6px;">
-  <img
-    id="gameOverAdImage"
-    src="https://cdnfa.com/irangiah/a9be/uploads/ads/tankads.webp"
-    alt="تبلیغ"
-    style="width:100%;border-radius:14px;cursor:pointer;display:block;"
-  />
-</div>
-      
-      
+        <img id="gameOverAdImage" alt="تبلیغ"
+             style="width:100%;border-radius:14px;cursor:pointer;display:block;" />
+      </div>
+
       <button class="closeBtn" id="retryBtn">دوباره تلاش کن</button>
     </div>
   </div>
 
-<!-- تبلیغ هنگام مکث -->
+  <!-- تبلیغ (مکث + بین‌راهی) -->
   <div id="adOverlay" class="overlay">
     <div class="box" id="adBox">
-      <h3 style="margin-bottom:10px;">📣 پیشنهاد ویژه</h3>
+      <h3 id="adTitle" style="margin-bottom:10px;">📣 پیشنهاد ویژه</h3>
 
-      <img
-        id="adImage"
-        src="https://cdnfa.com/irangiah/a9be/uploads/ads/tankads.webp"
-        alt="تبلیغ"
-        style="width:100%;border-radius:14px;cursor:pointer;display:block;"
-      />
+      <img id="adImage" alt="تبلیغ"
+           style="width:100%;border-radius:14px;cursor:pointer;display:block;" />
 
       <button class="closeBtn" id="closeAdBtn">بستن</button>
     </div>
   </div>
 
-
-  
-  <!-- ───────────── اسکریپت بازی ───────────── -->
   <script>
-  const canvas = document.getElementById("game");
-  const ctx = canvas.getContext("2d");
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
 
-  let baseX, baseY;
-  function resizeCanvas(){
-    const w = Math.min(window.innerWidth * 0.97, 460);
-    const h = Math.min(window.innerHeight * 0.70, 720);
-    canvas.width = w;
-    canvas.height = h;
-    baseX = canvas.width / 2;
-    baseY = canvas.height - 22;
-  }
-  resizeCanvas();
-  window.addEventListener("resize", resizeCanvas);
+    let baseX, baseY;
+    function resizeCanvas(){
+      const w = Math.min(window.innerWidth * 0.97, 460);
+      const h = Math.min(window.innerHeight * 0.70, 720);
+      canvas.width = w;
+      canvas.height = h;
+      baseX = canvas.width / 2;
+      baseY = canvas.height - 22;
+    }
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
 
-  const scoreEl = document.getElementById("currentScore");
-  const bestEl = document.getElementById("bestScore");
-  const levelLabel = document.getElementById("levelLabel");
-  const shopOverlay = document.getElementById("shopOverlay");
-  const shopBtn = document.getElementById("shopBtn");
-  const closeShopBtn = document.getElementById("closeShop");
-  const aboutBtn = document.getElementById("aboutBtn");
-  const shopMessage = document.getElementById("shopMessage");
-  const hintEl = document.getElementById("hint");
+    const scoreEl = document.getElementById("currentScore");
+    const bestEl = document.getElementById("bestScore");
+    const levelLabel = document.getElementById("levelLabel");
+    const shopOverlay = document.getElementById("shopOverlay");
+    const shopBtn = document.getElementById("shopBtn");
+    const closeShopBtn = document.getElementById("closeShop");
+    const aboutBtn = document.getElementById("aboutBtn");
+    const shopMessage = document.getElementById("shopMessage");
+    const hintEl = document.getElementById("hint");
 
-  const pauseBtn = document.getElementById("pauseBtn");
-  const soundBtn = document.getElementById("soundBtn");
+    const pauseBtn = document.getElementById("pauseBtn");
+    const soundBtn = document.getElementById("soundBtn");
 
-  const gameOverOverlay = document.getElementById("gameOverOverlay");
-  const gameOverScoreText = document.getElementById("gameOverScoreText");
-  const gameOverBestText = document.getElementById("gameOverBestText");
-  const retryBtn = document.getElementById("retryBtn");
+    const gameOverOverlay = document.getElementById("gameOverOverlay");
+    const gameOverScoreText = document.getElementById("gameOverScoreText");
+    const gameOverBestText = document.getElementById("gameOverBestText");
+    const retryBtn = document.getElementById("retryBtn");
 
-// ───────── تبلیغات (مثل تانکیتا) ─────────
-const AD_IMAGE = "https://cdnfa.com/irangiah/a9be/uploads/ads/tankads.webp";
-const AD_LINK  = "https://eitaa.com/tavita_ads"; // کانال تبلیغات (فعلا)
+    // ───────────────── تبلیغات ─────────────────
+    const AD_IMAGE = "https://cdnfa.com/irangiah/a9be/uploads/ads/tankads.webp";
+    const AD_LINK  = "https://eitaa.com/tavita_ads";   // کانال تبلیغات
+    const TAVITA_CHANNEL = "https://eitaa.com/tavita"; // کانال اصلی طاویتا
 
-function openAdLink(){
-  if (window.Eitaa && window.Eitaa.WebApp && typeof window.Eitaa.WebApp.openEitaaLink === "function") {
-    try { window.Eitaa.WebApp.openEitaaLink(AD_LINK); return; } catch(e){}
-  }
-  window.location.href = AD_LINK;
-}
+    function openEitaaUrl(url){
+      if (window.Eitaa && window.Eitaa.WebApp && typeof window.Eitaa.WebApp.openEitaaLink === "function") {
+        try { window.Eitaa.WebApp.openEitaaLink(url); return; } catch(e){}
+      }
+      window.location.href = url;
+    }
+    function openAdLink(){ openEitaaUrl(AD_LINK); }
 
-// المنت‌های پاپ‌آپ تبلیغ مکث
-const adOverlay  = document.getElementById("adOverlay");
-const closeAdBtn = document.getElementById("closeAdBtn");
-const adImage    = document.getElementById("adImage");
+    const adOverlay  = document.getElementById("adOverlay");
+    const closeAdBtn = document.getElementById("closeAdBtn");
+    const adImage    = document.getElementById("adImage");
+    const adTitle    = document.getElementById("adTitle");
 
-// ست کردن عکس + کلیک‌ها
-if (adImage) {
-  adImage.src = AD_IMAGE;
-  adImage.onclick = openAdLink;
-}
-if (closeAdBtn) closeAdBtn.onclick = ()=>{ if(adOverlay) adOverlay.style.display="none"; };
-if (adOverlay) {
-  adOverlay.addEventListener("click", (e)=>{
-    if(e.target === adOverlay) adOverlay.style.display="none";
-  });
-}
+    if (adImage) {
+      adImage.src = AD_IMAGE;
+      adImage.onclick = openAdLink;
+    }
 
-function showPauseAd(){
-  if(!adOverlay) return;
-  adOverlay.style.display = "flex";
-}
+    // حالت‌های تبلیغ:
+    // - pause: فقط نمایش (بازی از قبل pause شده)
+    // - interstitial: خودکار pause می‌کند و بعد از بستن، اگر لازم بود ادامه می‌دهد
+    let interstitialLock = false;
+    let resumeAfterAd = false;
+    let lastAdTs = 0;
 
-    
-// تبلیغ داخل گیم‌اور
-const gameOverAdImage = document.getElementById("gameOverAdImage");
-if (gameOverAdImage) {
-  gameOverAdImage.src = AD_IMAGE;
-  gameOverAdImage.onclick = openAdLink;
-}
-    
-  let audioCtx;
-  let isMuted = false;
-  function playBeep(freq=600, dur=0.07){
-    if(isMuted) return;
-    try{
-      if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.frequency.value = freq;
-      osc.type = "triangle";
-      gain.gain.value = 0.08;
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start();
-      osc.stop(audioCtx.currentTime + dur);
-    }catch(e){}
-  }
+    function hideAdOverlay(){
+      if(!adOverlay) return;
+      adOverlay.style.display = "none";
 
-  // ───── وضعیت بازی ─────
-  let balls = [];
-  let trails = [];
-  let blocks = [];
-  let powerUps = [];
-  let isAiming = false;
-  let aimX = 0, aimY = 0;
-  let score = 0, bestScore = 0;
-  let level = 1;
-  let waves = 0;
-  let numBalls = 18;
-  let damagePerHit = 1;
-  let bombChance = 0.10;
-  let turnInProgress = false;
-  let frame = 0;
-  let shake = 0;
-  let hintTimeout = null;
-  let isPaused = false;
-  let gameOver = false;
-
-  const cols = 7;
-  const padding = 6;
-
-  const randInt = (min,max)=>Math.floor(Math.random()*(max-min+1))+min;
-
-  function pickColor(type,v){
-    if(type==="bomb") return "#a66bff";
-    if(type==="ice") return "#66d9ff";
-    if(type==="moving") return "#ffb347";
-    if(type==="armor") return "#c084ff";
-    if(v<12) return "#00bfff";
-    if(v<20) return "#8a2be2";
-    if(v<30) return "#ffd700";
-    if(v<45) return "#ff8c00";
-    return "#ff5555";
-  }
-
-  function spawnRow(){
-    const blockWidth = (canvas.width - (cols+1)*padding)/cols;
-    const blockHeight = blockWidth * .7;
-
-    const spawnBase = 0.82 + level*0.03 + waves*0.02;
-    const spawnChance = Math.min(0.97, spawnBase);
-
-    for(let c=0; c<cols; c++){
-      if(Math.random() < spawnChance){
-        const x = padding + c*(blockWidth+padding);
-        const y = padding;
-
-        const base = 5 + (level * 3) + (waves * 2);
-        const multiplier = 1 + (level * 0.15);
-        const spread = 5 + level * 3;
-        let val = base + randInt(0, spread);
-
-        const difficultyBoost = 1 + (level-1)*0.28 + waves*0.18;
-        val = Math.floor(val * multiplier * difficultyBoost);
-
-        let type = "normal";
-        const r = Math.random();
-        const effBombChance = Math.min(
-          0.40,
-          bombChance + level * 0.02 + waves*0.01
-        );
-
-        if(r < effBombChance) type = "bomb";
-        else if(r < effBombChance + 0.04) type = "ice";
-        else if(r < effBombChance + 0.09) type = "moving";
-        else if(r < effBombChance + 0.14) type = "armor";
-
-        blocks.push({
-          x, y, w:blockWidth, h:blockHeight,
-          value: val,
-          type,
-          hpExtra: type==="ice" ? 1 : (type==="armor" ? 2 : 0),
-          color: pickColor(type, val),
-          alive: true,
-          vx: type === "moving"
-            ? (Math.random()<0.5 ? -1 : 1) * (1.1 + level * 0.18)
-            : 0
-        });
+      // اگر این تبلیغ از نوع interstitial بود، بعدش بازی رو برگردون
+      if(interstitialLock){
+        interstitialLock = false;
+        if(resumeAfterAd){
+          isPaused = false;
+          pauseBtn.textContent = "⏸";
+        }
+        resumeAfterAd = false;
       }
     }
 
-    if(Math.random() < 0.55){
-      const px = randInt(40, canvas.width - 40);
-      const py = padding + blockHeight + 12;
-      const types = ["extraBall","damageUp","bombUp"];
-      powerUps.push({x:px,y:py,r:10,type:types[randInt(0,2)],collected:false});
-    }
-  }
-
-  function moveBlocksDown(){
-    const baseRowHeight = blocks.length ? (blocks[0].h + padding) : 40;
-    const levelFactor = 1 + (level - 1) * 0.4;
-    const waveFactor = 1 + Math.min(waves, 20) * 0.06;
-    const moveAmount = baseRowHeight * levelFactor * waveFactor * 1.25;
-
-    for(const b of blocks) b.y += moveAmount;
-    for(const p of powerUps) p.y += moveAmount;
-  }
-
-  function updateLabels(){
-    scoreEl.textContent = score;
-    bestEl.textContent = bestScore;
-    levelLabel.textContent = level;
-  }
-
-  function resetGame(){
-    balls=[]; trails=[]; blocks=[]; powerUps=[];
-    score=0; level=1; waves=0;
-    numBalls=18;
-    damagePerHit=1;
-    bombChance=0.10;
-    turnInProgress=false; frame=0;
-    shake=0; isPaused=false; gameOver=false;
-    spawnRow();
-    updateLabels();
-  }
-
-  resetGame();
-
-  function shoot(angle){
-    balls=[]; trails=[];
-    const speed = 7.2 + level*0.55;
-    for(let i=0;i<numBalls;i++){
-      balls.push({
-        x:baseX,y:baseY,
-        vx:Math.cos(angle)*speed,
-        vy:Math.sin(angle)*speed,
-        delay:i*2,
-        active:false,
-        returned:false
+    if (closeAdBtn) closeAdBtn.onclick = hideAdOverlay;
+    if (adOverlay) {
+      adOverlay.addEventListener("click", (e)=>{
+        if(e.target === adOverlay) hideAdOverlay();
       });
     }
-    turnInProgress=true;
-    frame=0;
-    playBeep(650,0.09);
-  }
 
-  function getCanvasPos(evt){
-    const rect = canvas.getBoundingClientRect();
-    let clientX, clientY;
-    if(evt.touches && evt.touches[0]){
-      clientX = evt.touches[0].clientX;
-      clientY = evt.touches[0].clientY;
-    }else if(evt.changedTouches && evt.changedTouches[0]){
-      clientX = evt.changedTouches[0].clientX;
-      clientY = evt.changedTouches[0].clientY;
-    }else{
-      clientX = evt.clientX;
-      clientY = evt.clientY;
+    function showAd({ mode = "pause", title = "📣 پیشنهاد ویژه" } = {}){
+      if(!adOverlay) return;
+
+      // گپ زمانی: تبلیغ پشت سرهم نیاد
+      const now = Date.now();
+      if(mode !== "pause" && now - lastAdTs < 12000) return;
+
+      adTitle.textContent = title;
+      adOverlay.style.display = "flex";
+      lastAdTs = now;
+
+      if(mode === "interstitial"){
+        // اگر بازی در جریان بود یا pause نبود، بعدش برگردون
+        resumeAfterAd = !isPaused;
+        isPaused = true;
+        pauseBtn.textContent = "▶️";
+        interstitialLock = true;
+      }
     }
-    const x = (clientX - rect.left) * (canvas.width / rect.width);
-    const y = (clientY - rect.top)  * (canvas.height / rect.height);
-    return {x,y};
-  }
 
-  function startAim(evt){
-    if(turnInProgress || isPaused || gameOver) return;
-    isAiming=true;
-    const p = getCanvasPos(evt);
-    aimX=p.x; aimY=p.y;
-  }
+    // تبلیغ داخل گیم‌اور
+    const gameOverAdImage = document.getElementById("gameOverAdImage");
+    if (gameOverAdImage) {
+      gameOverAdImage.src = AD_IMAGE;
+      gameOverAdImage.onclick = openAdLink;
+    }
 
-  function moveAim(evt){
-    if(!isAiming || isPaused || gameOver) return;
-    const p = getCanvasPos(evt);
-    aimX=p.x; aimY=p.y;
-  }
+    // دکمه کانال طاویتا
+    aboutBtn.onclick = ()=>openEitaaUrl(TAVITA_CHANNEL);
 
-  function endAim(){
-    if(!isAiming || isPaused || gameOver) return;
-    isAiming=false;
-    let angle = Math.atan2(aimY-baseY, aimX-baseX);
-    if(angle>-0.15) angle=-0.15;
-    if(angle<-Math.PI+0.15) angle=-Math.PI+0.15;
-    shoot(angle);
-  }
+    // ───────────────── صدا ─────────────────
+    let audioCtx;
+    let isMuted = false;
+    function playBeep(freq=600, dur=0.07){
+      if(isMuted) return;
+      try{
+        if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.frequency.value = freq;
+        osc.type = "triangle";
+        gain.gain.value = 0.08;
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + dur);
+      }catch(e){}
+    }
 
-  canvas.addEventListener("mousedown", e=>startAim(e));
-  canvas.addEventListener("mousemove", e=>moveAim(e));
-  canvas.addEventListener("mouseup",   ()=>endAim());
+    // ───────────────── وضعیت بازی ─────────────────
+    let balls = [];
+    let trails = [];
+    let blocks = [];
+    let powerUps = [];
+    let isAiming = false;
+    let aimX = 0, aimY = 0;
+    let score = 0, bestScore = 0;
+    let level = 1;
+    let waves = 0;
+    let numBalls = 18;
+    let damagePerHit = 1;
+    let bombChance = 0.10;
+    let turnInProgress = false;
+    let frame = 0;
+    let shake = 0;
+    let hintTimeout = null;
+    let isPaused = false;
+    let gameOver = false;
 
-  canvas.addEventListener("touchstart", e=>{startAim(e); e.preventDefault();},{passive:false});
-  canvas.addEventListener("touchmove",  e=>{moveAim(e); e.preventDefault();},{passive:false});
-  canvas.addEventListener("touchend",   e=>{endAim();  e.preventDefault();},{passive:false});
+    const cols = 7;
+    const padding = 6;
+    const randInt = (min,max)=>Math.floor(Math.random()*(max-min+1))+min;
 
-  function showShopMsg(text){
-    shopMessage.textContent = text;
-    shopMessage.classList.remove("shopMessageVisible");
-    void shopMessage.offsetWidth;
-    shopMessage.classList.add("shopMessageVisible");
-  }
+    function pickColor(type,v){
+      if(type==="bomb") return "#a66bff";
+      if(type==="ice") return "#66d9ff";
+      if(type==="moving") return "#ffb347";
+      if(type==="armor") return "#c084ff";
+      if(v<12) return "#00bfff";
+      if(v<20) return "#8a2be2";
+      if(v<30) return "#ffd700";
+      if(v<45) return "#ff8c00";
+      return "#ff5555";
+    }
 
-  function flashHint(text){
-    if(hintTimeout) clearTimeout(hintTimeout);
-    const old = hintEl.textContent;
-    hintEl.textContent = text;
-    hintTimeout = setTimeout(()=>{hintEl.textContent = old;}, 3000);
-  }
+    function spawnRow(){
+      const blockWidth = (canvas.width - (cols+1)*padding)/cols;
+      const blockHeight = blockWidth * .7;
 
-  shopBtn.onclick = ()=>{ if(!turnInProgress && !gameOver) shopOverlay.style.display="flex"; };
-  closeShopBtn.onclick = ()=>shopOverlay.style.display="none";
-  shopOverlay.addEventListener("click",e=>{
-    if(e.target===shopOverlay) shopOverlay.style.display="none";
-  });
+      const spawnBase = 0.82 + level*0.03 + waves*0.02;
+      const spawnChance = Math.min(0.97, spawnBase);
 
-  document.querySelectorAll(".shopItem button").forEach(btn=>{
-    btn.addEventListener("click", ()=>{
-      const item = btn.getAttribute("data-item");
-      let cost = 0;
-      if(item === "balls") cost = 450;
-      else if(item === "damage") cost = 750;
-      else if(item === "bomb") cost = 600;
+      for(let c=0; c<cols; c++){
+        if(Math.random() < spawnChance){
+          const x = padding + c*(blockWidth+padding);
+          const y = padding;
 
-      if(score < cost){
-        showShopMsg("امتیاز کافی نداری 😅");
-        playBeep(200,0.1);
-        return;
+          const base = 5 + (level * 3) + (waves * 2);
+          const multiplier = 1 + (level * 0.15);
+          const spread = 5 + level * 3;
+          let val = base + randInt(0, spread);
+
+          const difficultyBoost = 1 + (level-1)*0.28 + waves*0.18;
+          val = Math.floor(val * multiplier * difficultyBoost);
+
+          let type = "normal";
+          const r = Math.random();
+          const effBombChance = Math.min(0.40, bombChance + level * 0.02 + waves*0.01);
+
+          if(r < effBombChance) type = "bomb";
+          else if(r < effBombChance + 0.04) type = "ice";
+          else if(r < effBombChance + 0.09) type = "moving";
+          else if(r < effBombChance + 0.14) type = "armor";
+
+          blocks.push({
+            x, y, w:blockWidth, h:blockHeight,
+            value: val,
+            type,
+            hpExtra: type==="ice" ? 1 : (type==="armor" ? 2 : 0),
+            color: pickColor(type, val),
+            alive: true,
+            vx: type === "moving" ? (Math.random()<0.5 ? -1 : 1) * (1.1 + level * 0.18) : 0
+          });
+        }
       }
 
-      score -= cost;
-      if(item==="balls"){
-        numBalls += 3;
-        flashHint("۳ توپ به مجموعه‌ات اضافه شد 🎯");
-      }else if(item==="damage"){
-        damagePerHit += 1;
-        flashHint("قدرت توپ‌ها بیشتر شد 🔥");
-      }else if(item==="bomb"){
-        bombChance += 0.03;
-        flashHint("شانس بلوک‌های بمب بالاتر رفت 💣");
+      if(Math.random() < 0.55){
+        const px = randInt(40, canvas.width - 40);
+        const py = padding + blockHeight + 12;
+        const types = ["extraBall","damageUp","bombUp"];
+        powerUps.push({x:px,y:py,r:10,type:types[randInt(0,2)],collected:false});
       }
+    }
 
-      const row = document.querySelector(`.shopItem[data-item-row="${item}"]`);
-      if(row){
-        row.classList.add("bought");
-        setTimeout(()=>row.classList.remove("bought"), 300);
-      }
+    function moveBlocksDown(){
+      const baseRowHeight = blocks.length ? (blocks[0].h + padding) : 40;
+      const levelFactor = 1 + (level - 1) * 0.4;
+      const waveFactor = 1 + Math.min(waves, 20) * 0.06;
+      const moveAmount = baseRowHeight * levelFactor * waveFactor * 1.25;
 
-      showShopMsg("خرید با موفقیت انجام شد ✅");
-      playBeep(900,0.12);
+      for(const b of blocks) b.y += moveAmount;
+      for(const p of powerUps) p.y += moveAmount;
+    }
+
+    function updateLabels(){
+      scoreEl.textContent = score;
+      bestEl.textContent = bestScore;
+      levelLabel.textContent = level;
+    }
+
+    function resetGame(){
+      balls=[]; trails=[]; blocks=[]; powerUps=[];
+      score=0; level=1; waves=0;
+      numBalls=18; damagePerHit=1; bombChance=0.10;
+      turnInProgress=false; frame=0; shake=0;
+      isPaused=false; gameOver=false;
+
+      spawnRow();
       updateLabels();
-    });
-  });
-
-  // 🔹 تابع کمکی برای باز کردن لینک کانال (با SDK یا بدونش)
-  function openTavitaChannel(){
-    const url = "https://eitaa.com/tavita";
-
-    if (window.Eitaa && window.Eitaa.WebApp && typeof window.Eitaa.WebApp.openEitaaLink === "function") {
-      try {
-        window.Eitaa.WebApp.openEitaaLink(url);
-        return;
-      } catch (e) {
-        console.warn("openEitaaLink failed, fallback to location", e);
-      }
     }
 
-    // اگر داخل ایتا نبودیم / SDK در دسترس نبود
-    window.location.href = url;
-  }
-
-  // 🔹 دکمه کانال طاویتا (جای پاپ‌آپ درباره ما)
-  aboutBtn.onclick = openTavitaChannel;
-
-  function applyPowerUp(type){
-    if(type==="extraBall"){
-      numBalls += 2;
-      flashHint("۲ توپ جایزه گرفتی! 😍");
-    }else if(type==="damageUp"){
-      damagePerHit += 1;
-      flashHint("قدرت ضربه توپ‌ها بیشتر شد 🔥");
-    }else if(type==="bombUp"){
-      bombChance += 0.03;
-      flashHint("از حالا بمب‌ها بیشتر می‌شن 💣");
-    }
-    playBeep(900,0.1);
-  }
-
-  pauseBtn.onclick = ()=>{
-  if(gameOver) return;
-
-  isPaused = !isPaused;
-  pauseBtn.textContent = isPaused ? "▶️" : "⏸";
-  flashHint(isPaused ? "بازی متوقف شد ⏸" : "ادامه بازی ▶️");
-
-  // وقتی مکث شد، تبلیغ رو نشون بده
-  if(isPaused){
-    showPauseAd();
-  } else {
-    // وقتی از مکث خارج شد، تبلیغ بسته باشه
-    if(adOverlay) adOverlay.style.display = "none";
-  }
-};
-
-  soundBtn.onclick = ()=>{
-    isMuted = !isMuted;
-    soundBtn.textContent = isMuted ? "🔇" : "🔊";
-  };
-
-  retryBtn.onclick = ()=>{
-    gameOverOverlay.style.display = "none";
     resetGame();
-  };
-  gameOverOverlay.addEventListener("click", e=>{
-    if(e.target === gameOverOverlay){
-      gameOverOverlay.style.display="none";
+
+    function shoot(angle){
+      balls=[]; trails=[];
+      const speed = 7.2 + level*0.55;
+      for(let i=0;i<numBalls;i++){
+        balls.push({
+          x:baseX,y:baseY,
+          vx:Math.cos(angle)*speed,
+          vy:Math.sin(angle)*speed,
+          delay:i*2,
+          active:false,
+          returned:false
+        });
+      }
+      turnInProgress=true;
+      frame=0;
+      playBeep(650,0.09);
+    }
+
+    function getCanvasPos(evt){
+      const rect = canvas.getBoundingClientRect();
+      let clientX, clientY;
+      if(evt.touches && evt.touches[0]){
+        clientX = evt.touches[0].clientX;
+        clientY = evt.touches[0].clientY;
+      }else if(evt.changedTouches && evt.changedTouches[0]){
+        clientX = evt.changedTouches[0].clientX;
+        clientY = evt.changedTouches[0].clientY;
+      }else{
+        clientX = evt.clientX;
+        clientY = evt.clientY;
+      }
+      const x = (clientX - rect.left) * (canvas.width / rect.width);
+      const y = (clientY - rect.top)  * (canvas.height / rect.height);
+      return {x,y};
+    }
+
+    function startAim(evt){
+      if(turnInProgress || isPaused || gameOver) return;
+      isAiming=true;
+      const p = getCanvasPos(evt);
+      aimX=p.x; aimY=p.y;
+    }
+
+    function moveAim(evt){
+      if(!isAiming || isPaused || gameOver) return;
+      const p = getCanvasPos(evt);
+      aimX=p.x; aimY=p.y;
+    }
+
+    function endAim(){
+      if(!isAiming || isPaused || gameOver) return;
+      isAiming=false;
+      let angle = Math.atan2(aimY-baseY, aimX-baseX);
+      if(angle>-0.15) angle=-0.15;
+      if(angle<-Math.PI+0.15) angle=-Math.PI+0.15;
+      shoot(angle);
+    }
+
+    canvas.addEventListener("mousedown", e=>startAim(e));
+    canvas.addEventListener("mousemove", e=>moveAim(e));
+    canvas.addEventListener("mouseup",   ()=>endAim());
+
+    canvas.addEventListener("touchstart", e=>{startAim(e); e.preventDefault();},{passive:false});
+    canvas.addEventListener("touchmove",  e=>{moveAim(e); e.preventDefault();},{passive:false});
+    canvas.addEventListener("touchend",   e=>{endAim();  e.preventDefault();},{passive:false});
+
+    function showShopMsg(text){
+      shopMessage.textContent = text;
+      shopMessage.classList.remove("shopMessageVisible");
+      void shopMessage.offsetWidth;
+      shopMessage.classList.add("shopMessageVisible");
+    }
+
+    function flashHint(text){
+      if(hintTimeout) clearTimeout(hintTimeout);
+      const old = hintEl.textContent;
+      hintEl.textContent = text;
+      hintTimeout = setTimeout(()=>{hintEl.textContent = old;}, 3000);
+    }
+
+    shopBtn.onclick = ()=>{ if(!turnInProgress && !gameOver) shopOverlay.style.display="flex"; };
+    closeShopBtn.onclick = ()=>shopOverlay.style.display="none";
+    shopOverlay.addEventListener("click",e=>{
+      if(e.target===shopOverlay) shopOverlay.style.display="none";
+    });
+
+    document.querySelectorAll(".shopItem button").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const item = btn.getAttribute("data-item");
+        let cost = 0;
+        if(item === "balls") cost = 450;
+        else if(item === "damage") cost = 750;
+        else if(item === "bomb") cost = 600;
+
+        if(score < cost){
+          showShopMsg("امتیاز کافی نداری 😅");
+          playBeep(200,0.1);
+          return;
+        }
+
+        score -= cost;
+        if(item==="balls"){
+          numBalls += 3;
+          flashHint("۳ توپ به مجموعه‌ات اضافه شد 🎯");
+        }else if(item==="damage"){
+          damagePerHit += 1;
+          flashHint("قدرت توپ‌ها بیشتر شد 🔥");
+        }else if(item==="bomb"){
+          bombChance += 0.03;
+          flashHint("شانس بلوک‌های بمب بالاتر رفت 💣");
+        }
+
+        const row = document.querySelector(`.shopItem[data-item-row="${item}"]`);
+        if(row){
+          row.classList.add("bought");
+          setTimeout(()=>row.classList.remove("bought"), 300);
+        }
+
+        showShopMsg("خرید با موفقیت انجام شد ✅");
+        playBeep(900,0.12);
+        updateLabels();
+      });
+    });
+
+    function applyPowerUp(type){
+      if(type==="extraBall"){
+        numBalls += 2;
+        flashHint("۲ توپ جایزه گرفتی! 😍");
+      }else if(type==="damageUp"){
+        damagePerHit += 1;
+        flashHint("قدرت ضربه توپ‌ها بیشتر شد 🔥");
+      }else if(type==="bombUp"){
+        bombChance += 0.03;
+        flashHint("از حالا بمب‌ها بیشتر می‌شن 💣");
+      }
+      playBeep(900,0.1);
+    }
+
+    // ───────── Pause: با مکث کاربر تبلیغ بیاد ─────────
+    pauseBtn.onclick = ()=>{
+      if(gameOver) return;
+
+      isPaused = !isPaused;
+      pauseBtn.textContent = isPaused ? "▶️" : "⏸";
+      flashHint(isPaused ? "بازی متوقف شد ⏸" : "ادامه بازی ▶️");
+
+      if(isPaused){
+        showAd({ mode:"pause", title:"📣 پیشنهاد ویژه" });
+      } else {
+        // خروج از مکث → اگر تبلیغ بازه ببند
+        if(adOverlay) adOverlay.style.display = "none";
+      }
+    };
+
+    soundBtn.onclick = ()=>{
+      isMuted = !isMuted;
+      soundBtn.textContent = isMuted ? "🔇" : "🔊";
+    };
+
+    retryBtn.onclick = ()=>{
+      gameOverOverlay.style.display = "none";
       resetGame();
-    }
-  });
-
-  function update(){
-    frame++;
-
-    for(const b of blocks){
-      if(b.type==="moving" && b.alive){
-        b.x += b.vx;
-        if(b.x<=padding || b.x+b.w>=canvas.width-padding) b.vx*=-1;
+    };
+    gameOverOverlay.addEventListener("click", e=>{
+      if(e.target === gameOverOverlay){
+        gameOverOverlay.style.display="none";
+        resetGame();
       }
-    }
+    });
 
-    for(const p of powerUps){
-      if(!p.collected) p.y += 0.15;
-    }
-
-    let activeAny=false;
-    for(const ball of balls){
-      if(!ball.active && frame>=ball.delay) ball.active=true;
-      if(!ball.active || ball.returned) continue;
-      activeAny=true;
-
-      ball.x += ball.vx;
-      ball.y += ball.vy;
-
-      trails.push({x:ball.x,y:ball.y,life:18});
-
-      if(ball.x<=4 || ball.x>=canvas.width-4){
-        ball.vx*=-1;
-        ball.x = Math.max(4,Math.min(canvas.width-4,ball.x));
-      }
-      if(ball.y<=4){
-        ball.vy*=-1;
-        ball.y=4;
-      }
+    function update(){
+      frame++;
 
       for(const b of blocks){
-        if(!b.alive) continue;
-        if(ball.x>b.x && ball.x<b.x+b.w && ball.y>b.y && ball.y<b.y+b.h){
-          const ol = ball.x - b.x;
-          const orr = (b.x+b.w)-ball.x;
-          const ot = ball.y - b.y;
-          const ob = (b.y+b.h)-ball.y;
-          const minO = Math.min(ol,orr,ot,ob);
-          if(minO===ol || minO===orr) ball.vx*=-1;
-          else ball.vy*=-1;
-
-          if(b.type==="ice" && b.hpExtra>0){
-            b.hpExtra--;
-            if(b.hpExtra===0){b.type="normal";b.color=pickColor(b.type,b.value);}
-          }else if(b.type==="armor" && b.hpExtra>0){
-            b.hpExtra--;
-          }else{
-            b.value -= damagePerHit;
-          }
-
-          if(b.value<=0){
-            b.alive=false;
-            score+=3;
-            playBeep(430,0.08);
-            if(b.type==="bomb"){
-              shake=10;
-              for(const nb of blocks){
-                if(!nb.alive||nb===b) continue;
-                const dx = Math.abs((nb.x+nb.w/2)-(b.x+b.w/2));
-                const dy = Math.abs((nb.y+nb.h/2)-(b.y+b.h/2));
-                if(dx<b.w*1.3 && dy<b.h*1.3){
-                  nb.value -= damagePerHit*2;
-                  if(nb.value<=0) nb.alive=false;
-                }
-              }
-            }
-          }else{
-            b.color = pickColor(b.type,b.value);
-            score+=1;
-          }
-
-          if(score>bestScore) bestScore=score;
-          updateLabels();
+        if(b.type==="moving" && b.alive){
+          b.x += b.vx;
+          if(b.x<=padding || b.x+b.w>=canvas.width-padding) b.vx*=-1;
         }
       }
 
       for(const p of powerUps){
-        if(p.collected) continue;
-        const dx = ball.x - p.x;
-        const dy = ball.y - p.y;
-        if(Math.sqrt(dx*dx+dy*dy) < p.r+6){
-          p.collected=true;
-          applyPowerUp(p.type);
+        if(!p.collected) p.y += 0.15;
+      }
+
+      let activeAny=false;
+      for(const ball of balls){
+        if(!ball.active && frame>=ball.delay) ball.active=true;
+        if(!ball.active || ball.returned) continue;
+        activeAny=true;
+
+        ball.x += ball.vx;
+        ball.y += ball.vy;
+
+        trails.push({x:ball.x,y:ball.y,life:18});
+
+        if(ball.x<=4 || ball.x>=canvas.width-4){
+          ball.vx*=-1;
+          ball.x = Math.max(4,Math.min(canvas.width-4,ball.x));
+        }
+        if(ball.y<=4){
+          ball.vy*=-1;
+          ball.y=4;
+        }
+
+        for(const b of blocks){
+          if(!b.alive) continue;
+          if(ball.x>b.x && ball.x<b.x+b.w && ball.y>b.y && ball.y<b.y+b.h){
+            const ol = ball.x - b.x;
+            const orr = (b.x+b.w)-ball.x;
+            const ot = ball.y - b.y;
+            const ob = (b.y+b.h)-ball.y;
+            const minO = Math.min(ol,orr,ot,ob);
+            if(minO===ol || minO===orr) ball.vx*=-1;
+            else ball.vy*=-1;
+
+            if(b.type==="ice" && b.hpExtra>0){
+              b.hpExtra--;
+              if(b.hpExtra===0){b.type="normal";b.color=pickColor(b.type,b.value);}
+            }else if(b.type==="armor" && b.hpExtra>0){
+              b.hpExtra--;
+            }else{
+              b.value -= damagePerHit;
+            }
+
+            if(b.value<=0){
+              b.alive=false;
+              score+=3;
+              playBeep(430,0.08);
+              if(b.type==="bomb"){
+                shake=10;
+                for(const nb of blocks){
+                  if(!nb.alive||nb===b) continue;
+                  const dx = Math.abs((nb.x+nb.w/2)-(b.x+b.w/2));
+                  const dy = Math.abs((nb.y+nb.h/2)-(b.y+b.h/2));
+                  if(dx<b.w*1.3 && dy<b.h*1.3){
+                    nb.value -= damagePerHit*2;
+                    if(nb.value<=0) nb.alive=false;
+                  }
+                }
+              }
+            }else{
+              b.color = pickColor(b.type,b.value);
+              score+=1;
+            }
+
+            if(score>bestScore) bestScore=score;
+            updateLabels();
+          }
+        }
+
+        for(const p of powerUps){
+          if(p.collected) continue;
+          const dx = ball.x - p.x;
+          const dy = ball.y - p.y;
+          if(Math.sqrt(dx*dx+dy*dy) < p.r+6){
+            p.collected=true;
+            applyPowerUp(p.type);
+          }
+        }
+
+        if(ball.y>=canvas.height-6 && ball.vy>0){
+          ball.returned=true;
         }
       }
 
-      if(ball.y>=canvas.height-6 && ball.vy>0){
-        ball.returned=true;
+      trails = trails.filter(t=>--t.life>0);
+      blocks = blocks.filter(b=>b.alive);
+      powerUps = powerUps.filter(p=>!p.collected && p.y<canvas.height-30);
+
+      if(turnInProgress && !activeAny){
+        turnInProgress = false;
+        frame = 0;
+        waves++;
+
+        // ✅ Interstitial تجاری (هوشمند):
+        // - بعد از wave اول یک بار
+        // - بعد از هر 5 wave (همزمان با level up)
+        // با فاصله زمانی کنترل‌شده (داخل showAd)
+        if(waves === 1){
+          showAd({ mode:"interstitial", title:"🎁 پیشنهاد ویژه برای شروع!" });
+        }
+
+        if(waves % 5 === 0){
+          level++;
+          flashHint("🎉 مرحله " + level + " شروع شد! سخت‌تر شد…");
+          playBeep(1100, 0.17);
+
+          // همزمان با Level up یک interstitial خوشگل
+          showAd({ mode:"interstitial", title:"🔥 پیشنهاد ویژه مرحله " + level });
+        }
+
+        moveBlocksDown();
+        spawnRow();
+
+        for(const b of blocks){
+          if(b.y + b.h >= canvas.height - 20){
+            playBeep(200, 0.4);
+            if(score > bestScore) bestScore = score;
+            updateLabels();
+
+            gameOver = true;
+            gameOverScoreText.textContent = "امتیاز شما: " + score;
+            gameOverBestText.textContent = "بهترین رکورد: " + bestScore;
+            gameOverOverlay.style.display = "flex";
+            return;
+          }
+        }
+
+        updateLabels();
       }
+
+      if(shake>0) shake--;
     }
 
-    trails = trails.filter(t=>--t.life>0);
-    blocks = blocks.filter(b=>b.alive);
-    powerUps = powerUps.filter(p=>!p.collected && p.y<canvas.height-30);
+    function draw(){
+      const rnd = (min,max)=>Math.floor(Math.random()*(max-min+1))+min;
+      const ox = shake? rnd(-shake,shake):0;
+      const oy = shake? rnd(-shake,shake):0;
+      ctx.save();
+      ctx.translate(ox,oy);
+      ctx.clearRect(-ox,-oy,canvas.width,canvas.height);
 
-    if(turnInProgress && !activeAny){
-      turnInProgress = false;
-      frame = 0;
-      waves++;
+      const grad = ctx.createLinearGradient(0,0,0,canvas.height);
+      grad.addColorStop(0,"#1a1450");
+      grad.addColorStop(1,"#09051f");
+      ctx.fillStyle=grad;
+      ctx.fillRect(0,0,canvas.width,canvas.height);
 
-      if(waves % 5 === 0){
-        level++;
-        flashHint("🎉 مرحله " + level + " شروع شد! سخت‌تر شد…");
-        playBeep(1100, 0.17);
-      }
-
-      moveBlocksDown();
-      spawnRow();
+      ctx.textAlign="center";
+      ctx.textBaseline="middle";
+      ctx.font="bold 14px sans-serif";
 
       for(const b of blocks){
-        if(b.y + b.h >= canvas.height - 20){
-          playBeep(200, 0.4);
-          if(score > bestScore) bestScore = score;
-          updateLabels();
-          gameOver = true;
-          gameOverScoreText.textContent = "امتیاز شما: " + score;
-          gameOverBestText.textContent = "بهترین رکورد: " + bestScore;
-          gameOverOverlay.style.display = "flex";
-          return;
-        }
+        ctx.fillStyle="rgba(0,0,0,0.4)";
+        ctx.fillRect(b.x+2,b.y+3,b.w,b.h);
+
+        const g = ctx.createLinearGradient(b.x,b.y,b.x,b.y+b.h);
+        g.addColorStop(0,b.color);
+        g.addColorStop(1,"#ffffff22");
+        ctx.fillStyle=g;
+        ctx.fillRect(b.x,b.y,b.w,b.h);
+
+        ctx.strokeStyle="#ffffff33";
+        ctx.lineWidth=1;
+        ctx.strokeRect(b.x+0.5,b.y+0.5,b.w-1,b.h-1);
+
+        ctx.fillStyle="#fff";
+        ctx.fillText(Math.max(1,Math.round(b.value)), b.x+b.w/2, b.y+b.h/2);
       }
 
-      updateLabels();
-    }
+      for(const p of powerUps){
+        let colorOuter="#4cffb5";
+        let text="B";
+        if(p.type==="extraBall"){ colorOuter="#1abc9c"; text="+B"; }
+        else if(p.type==="damageUp"){ colorOuter="#ff9f43"; text="DMG"; }
+        else if(p.type==="bombUp"){ colorOuter="#9b59b6"; text="BOMB"; }
 
-    if(shake>0) shake--;
-  }
+        ctx.beginPath();
+        const g2 = ctx.createRadialGradient(p.x,p.y,2,p.x,p.y,p.r+4);
+        g2.addColorStop(0,"#ffffff");
+        g2.addColorStop(1,colorOuter);
+        ctx.fillStyle=g2;
+        ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+        ctx.fill();
+        ctx.strokeStyle="#ffffffaa";
+        ctx.lineWidth=1;
+        ctx.stroke();
 
-  function draw(){
-    const rnd = (min,max)=>Math.floor(Math.random()*(max-min+1))+min;
-    const ox = shake? rnd(-shake,shake):0;
-    const oy = shake? rnd(-shake,shake):0;
-    ctx.save();
-    ctx.translate(ox,oy);
-    ctx.clearRect(-ox,-oy,canvas.width,canvas.height);
+        ctx.fillStyle="#003";
+        ctx.font="9px sans-serif";
+        ctx.fillText(text,p.x,p.y+0.5);
+      }
 
-    const grad = ctx.createLinearGradient(0,0,0,canvas.height);
-    grad.addColorStop(0,"#1a1450");
-    grad.addColorStop(1,"#09051f");
-    ctx.fillStyle=grad;
-    ctx.fillRect(0,0,canvas.width,canvas.height);
+      for(const t of trails){
+        ctx.beginPath();
+        const alpha = t.life/18;
+        ctx.fillStyle=`rgba(255,255,255,${alpha})`;
+        ctx.arc(t.x,t.y,3,0,Math.PI*2);
+        ctx.fill();
+      }
 
-    ctx.textAlign="center";
-    ctx.textBaseline="middle";
-    ctx.font="bold 14px sans-serif";
-    for(const b of blocks){
-      ctx.fillStyle="rgba(0,0,0,0.4)";
-      ctx.fillRect(b.x+2,b.y+3,b.w,b.h);
-      const g = ctx.createLinearGradient(b.x,b.y,b.x,b.y+b.h);
-      g.addColorStop(0,b.color);
-      g.addColorStop(1,"#ffffff22");
-      ctx.fillStyle=g;
-      ctx.fillRect(b.x,b.y,b.w,b.h);
-      ctx.strokeStyle="#ffffff33";
-      ctx.lineWidth=1;
-      ctx.strokeRect(b.x+0.5,b.y+0.5,b.w-1,b.h-1);
-      ctx.fillStyle="#fff";
-      ctx.fillText(Math.max(1,Math.round(b.value)), b.x+b.w/2, b.y+b.h/2);
-    }
-
-    for(const p of powerUps){
-      let colorOuter="#4cffb5";
-      let text="B";
-      if(p.type==="extraBall"){ colorOuter="#1abc9c"; text="+B"; }
-      else if(p.type==="damageUp"){ colorOuter="#ff9f43"; text="DMG"; }
-      else if(p.type==="bombUp"){ colorOuter="#9b59b6"; text="BOMB"; }
+      ctx.fillStyle="#ffffff";
+      for(const ball of balls){
+        if(!ball.active || ball.returned) continue;
+        ctx.beginPath();
+        ctx.arc(ball.x,ball.y,4,0,Math.PI*2);
+        ctx.fill();
+      }
 
       ctx.beginPath();
-      const g2 = ctx.createRadialGradient(p.x,p.y,2,p.x,p.y,p.r+4);
-      g2.addColorStop(0,"#ffffff");
-      g2.addColorStop(1,colorOuter);
-      ctx.fillStyle=g2;
-      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.arc(baseX,baseY,6,0,Math.PI*2);
+      ctx.fillStyle="#ffffff";
       ctx.fill();
-      ctx.strokeStyle="#ffffffaa";
-      ctx.lineWidth=1;
-      ctx.stroke();
 
-      ctx.fillStyle="#003";
-      ctx.font="9px sans-serif";
-      ctx.fillText(text,p.x,p.y+0.5);
+      if(!turnInProgress && isAiming){
+        ctx.setLineDash([5,5]);
+        ctx.strokeStyle="#ffffffbb";
+        ctx.beginPath();
+        ctx.moveTo(baseX,baseY);
+        ctx.lineTo(aimX,aimY);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      ctx.restore();
     }
 
-    for(const t of trails){
-      ctx.beginPath();
-      const alpha = t.life/18;
-      ctx.fillStyle=`rgba(255,255,255,${alpha})`;
-      ctx.arc(t.x,t.y,3,0,Math.PI*2);
-      ctx.fill();
+    function loop(){
+      if(!isPaused && !gameOver){
+        update();
+      }
+      draw();
+      requestAnimationFrame(loop);
     }
-
-    ctx.fillStyle="#ffffff";
-    for(const ball of balls){
-      if(!ball.active || ball.returned) continue;
-      ctx.beginPath();
-      ctx.arc(ball.x,ball.y,4,0,Math.PI*2);
-      ctx.fill();
-    }
-
-    ctx.beginPath();
-    ctx.arc(baseX,baseY,6,0,Math.PI*2);
-    ctx.fillStyle="#ffffff";
-    ctx.fill();
-
-    if(!turnInProgress && isAiming){
-      ctx.setLineDash([5,5]);
-      ctx.strokeStyle="#ffffffbb";
-      ctx.beginPath();
-      ctx.moveTo(baseX,baseY);
-      ctx.lineTo(aimX,aimY);
-      ctx.stroke();
-      ctx.setLineDash([]);
-    }
-
-    ctx.restore();
-  }
-
-  function loop(){
-    if(!isPaused && !gameOver){
-      update();
-    }
-    draw();
-    requestAnimationFrame(loop);
-  }
-  loop();
+    loop();
   </script>
 </body>
 </html>
